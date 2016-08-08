@@ -445,12 +445,14 @@ function updateTelporterList()
 end
 
 function removeTelFromList(localTelIndex)
-   table.remove(global.TelaportLocations,localTelIndex)
-   if global.guiTelSetting.visiable == true then 
-      for x,player in ipairs(game.players) do
-            creatTelportWindow(player)
-         end
-      end
+	table.remove(global.TelaportLocations,localTelIndex)
+	if global.guiTelSetting.visiable == true then 
+		local playerNum1 = 1
+		while game.players[playerNum1] do
+			creatTelportWindow(game.players[playerNum1])
+			playerNum1 = playerNum1 +1
+		end
+	end
 end
 
 
