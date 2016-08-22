@@ -1,0 +1,20 @@
+{
+  "item":
+  [
+    ["portal", "Portal"],
+    ["Teleporter_Beacon", "Teleporter-Beacon"]
+  ],
+  "entity":
+  [
+    ["Teleporter_Beacon", "Teleporter-Beacon"]
+  ],
+  "recipe":
+  [
+    ["portal", "Portal"],
+    ["Teleporter_Beacon", "Teleporter-Beacon"]
+  ],
+  "technology":
+  [
+    ["PersonalTeleportation", "Personal-Teleportation"]
+  ]
+}

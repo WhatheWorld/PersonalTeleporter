@@ -1,42 +1,36 @@
---A lot of Thanks to iUltimateLP and his mod SimpleTeleporters for inspiration and for the use of His Code and graphics
+--[[Defines how many teleporter beacons should be on page. NOT ZERO VALUE!
+    Default is 10. ]]
+PersonalTeleporter.config.page_size = 10
 
---this is not used in personal Teleporter but is left over from simpleTeleporter
---[[
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	SimpleTeleporters Config File
+--[[Defines what should be shown in pager.
+    • "true" for pages (e.g. "2/4")
+    • "false" for beacons count (e.g. "11-20/37", if page_size is 10)
+    Default is "true". ]]
+--PersonalTeleporter.config.show_page_numbers = true; TODO. Not yet implemented. I'm lazy))) But should I? Maybe it's quite useless?
 
-Short tutorial:
-	To the left you see the variable names
-	After the equal sign, you see the value which you can change
-	
-Do not delete anything, this will break the mod.
+--[[Defines whether all players can use all beacons in spite of force membership or not.
+    • "true" members of opposing force can use your beacons
+    • "false" all beacons are common only inside one force
+    Default is "false". ]]
+PersonalTeleporter.config.all_beacons_for_all = false
 
-### Variable Definitions ###
+--[[Defines whether straight jumping ignores collisions (buildings, trees, water) or not.
+    • "true" is for ignoring all collisions
+    • "false" is for normal behaviour of collisions check
+    Default is "false". ]]
+PersonalTeleporter.config.straight_jump_ignores_collisions = false
 
-	TIER_X_BUFFER_CAPACITY
-		Defines how much buffer capacity the teleporter has.
-		In MegaJoule (MJ)
-	TIER_X_TELEPORT_POWER
-		Defines how much power the teleporter needs to teleport.
-		In MegaJoule (MJ)
-	TIER_X_DISTANCE
-		Defines the distance the teleporter can handle.
-		In Tiles (1 Tile = Size of one belt)
-	TIER_X_COOLDOWN
-		The cooldown per tier.
-		In Seconds
+--[[Defines how much energy should be in Personal Teleporter equipment to use Portal for straight jump. NOT ZERO VALUE!
+    Note: Personal Teleporter stats are: buffer = 10MJ, input limit = 50kW.
+    Default is 10000 (10kJ/m). ]]
+PersonalTeleporter.config.energy_in_personal_teleporter_to_use_portal = 10000
 
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-]]--
+--[[Defines how much energy should be in Personal Teleporter equipment to jump to Teleporter Beacon. NOT ZERO VALUE!
+    Note: Personal Teleporter stats are: buffer = 10MJ, input limit = 50kW.
+    Default is 2000000 (2MJ). ]]
+PersonalTeleporter.config.energy_in_personal_teleporter_to_use_beacon = 2000000
 
--- General Settings
-MSG_OUTPUT_MODE = 2 -- 1 is FlyingText; 2 is Chat
-FLOW_DIVIDER = 60 -- Global Dividier for calculation Flow limit values
-
--- TIER 1
-TIER_01_BUFFER_CAPACITY = 60
-TIER_01_TELEPORT_POWER = 15
-TIER_01_DISTANCE = 200
-TIER_01_FLOW_LIMIT = TIER_01_BUFFER_CAPACITY / FLOW_DIVIDER
-TIER_01_COOLDOWN = 10
-
+--[[Defines how much energy should be in Teleporter Beacon to accept it's activation. NOT ZERO VALUE!
+    Note: Teleporter Beacon stats are: buffer = 60MJ, input limit = 1MW.
+    Default is 10000000 (10MJ). ]]
+PersonalTeleporter.config.energy_in_beacon_to_activate = 10000000

@@ -1,30 +1,24 @@
 --A lot of Thanks to iUltimateLP and his mod SimpleTeleporters for inspiration and for the use of His Code and graphics
 
-
-
-require("config")
-
-DIVIDER = 60
-
 data:extend({
   {
     type = "accumulator",
-    name = "Teleporter_Beacon",
+    name = "Teleporter-Beacon",
     icon = "__PersonalTeleporter__/graphics/icon.png",
     flags = {"placeable-neutral", "player-creation"},
-    minable = {hardness = 0.2, mining_time = 0.5, result = "Teleporter_Beacon"},
+    minable = {hardness = 0.2, mining_time = 0.5, result = "Teleporter-Beacon"},
     max_health = 150,
     corpse = "medium-remnants",
     collision_box = {{-2, -2}, {2,2}},
     collision_mask = {"water-tile", "item-layer", "object-layer"},
     selection_box = {{-2, -2}, {2, 2}},
-	render_layer = decorative,
+    render_layer = decorative,
     energy_source =
     {
       type = "electric",
-      buffer_capacity = TIER_01_BUFFER_CAPACITY.."MJ",
+      buffer_capacity = "60MJ",
       usage_priority = "terciary",
-      input_flow_limit = TIER_01_FLOW_LIMIT.."MW",
+      input_flow_limit = "1MW",
       output_flow_limit = "0W"
     },
     picture =
@@ -62,7 +56,4 @@ data:extend({
     discharge_cooldown = 60,
     discharge_light = {intensity = 0.7, size = 7},
   }
-  
-  
-  
 })

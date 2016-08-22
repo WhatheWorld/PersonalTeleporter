@@ -1,0 +1,38 @@
+0.2.0:
+• mod has been entirely rewritten;
+• fully configurable (see config);
+• fully localizable: gui, tooltips, messages and game objects (see locale);
+• all messages became more informative;
+• added new item: Jump Targeter, used for targeting position you want to jump to; uses Personal Teleporter's energy to work;
+• added gui-buttons for GPS-sorting existing beacons: as is in (G)lobal list, by distance from the (P)layer, by distance from the (S)tarting zone;
+• now gui works supagood!))) it's always updated for all players of all forces;
+• added support for multy-force games: each force owns it's beacons and can't use another force's ones. Or can - configurable;
+• lots of tooltips added - also localizable;
+• mod's main button restyled: has graphics of Personal Teleporter equipment;
+• Personal Teleporter equipment is now 2x2 (not 3x3) in your armour; and it also charges slower (33% decreased charge rate); but you can use several ones; but it's very expensive; balanced ))))
+• changed recipes, removed alien liquid and teleporter core (Occam's Razor principle: do not multiply unneeded entities)
+• Teleporter Beacons now stackable by 5;
+• realized migration 0.1.6 -> 0.2.0: beacons and items will be replaced, gui - updated, global list - rewritten, another vars - nil'ed.
+
+0.2.1:
+• now Jump Targeter spents energy per distance;
+• Personal Teleporter equipment is battery-like, not shield-like: disappeared infinite progressbar of shield capacity;
+• several messages became much more informative;
+• no more local variables in the control.lua top! no more desyncs! should work well in multiplayer (feedback needed);
+• gui settings are being saved per player now;
+• technology is splitted into two: the first is mid-game Teleporter Beacons and the second is late-game Personal Teleporter equipment and Jump Targeter. Big thanks to credomane for his great idea! now you can teleport to Beacons when you stay on another Beacon, if both have enough energy; if so - Personal Teleporter equipment will be ignored.
+
+0.2.2:
+• fixed crash on paging list of Beacons;
+• fixed technology names "UnknownKey"-bug;
+• fixed too long cooldown between straight jumps;
+• optimized performance by replacing on_tick event handler with simplier and less frequent logic (oh, that useless tick-counting...);
+• added more informativeness to items descriptions;
+• added "Y"-hotkey for quick toggling visibility of Teleporter Beacons list; configurable (see game menu -> settings -> controls -> mods) and localizable (see locale);
+• added some details in config file.
+
+0.2.3:
+• fixed that hotkey could open beacons list even if there were no beacons;
+• fixed crash that new players couldn't use straight jumping;
+• fixed that there were no feedback from Jump Targeter if player was not equipped with Personal Teleporter;
+• removed Beacon name from rename dialog header.
