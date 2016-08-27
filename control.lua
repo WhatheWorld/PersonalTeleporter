@@ -65,7 +65,7 @@ function creatTelportWindow(Parplayer)
 
 
    local player = Parplayer
-      local gui = player.gui.left
+      local gui = player.gui.top
    if gui.personlaTeleportWindow ~= nil then
       gui.personlaTeleportWindow.destroy()
 
@@ -124,7 +124,7 @@ script.on_event(defines.events.on_gui_click, function(event)
      local PTHasEnergy = false
      local TBHasEnergy = false
      if player.get_inventory(defines.inventory.player_armor)[1].valid_for_read then    --get_item_count("Personal-Teleporter") > 0 then
-      if player.get_inventory(defines.inventory.player_armor)[1].has_grid then
+      if player.get_inventory(defines.inventory.player_armor)[1].grid then
         local equipment = player.get_inventory(defines.inventory.player_armor)[1].grid.equipment
         for indexE,equip in pairs(equipment) do
           if equip.name == "Personal-Teleporter" then
