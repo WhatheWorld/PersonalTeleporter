@@ -29,6 +29,7 @@ data:extend(
 		},
 		max_shield_value = 0,
 		energy_per_shield = "0J",
+    categories = {"armor"}
 	}
 
 })
