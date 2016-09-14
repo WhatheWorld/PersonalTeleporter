@@ -49,7 +49,19 @@ if global.TelaportLocations == nil then
       --global.TelaportLocations[x][2] = x 
       --global.TelaportLocations[x][3] = y 
       --global.TelaportLocations[x][4] = surface
-   end
+      --global.TelaportLocations[x][5] = maker entity
+  else
+    for i,telaportLoc in ipairs(global.TelaportLocations) do
+      if telaportLoc[5] == nil then
+        local position ={}
+        position.x = telaportLoc[2]
+        position.y = telaportLoc[3]
+        local maker = game.surfaces[1].create_entity({name="TP_marker",position = position, force = game.forces.neutral})
+        maker.backer_name = telaportLoc[1]
+        telaportLoc[5] = maker
+      end
+    end
+  end
 if global.guiTelSetting == nil then
    global.guiTelSetting = {}
    global.guiTelSetting.visiable = false
@@ -65,7 +77,7 @@ function creatTelportWindow(Parplayer)
 
 
    local player = Parplayer
-      local gui = player.gui.top
+      local gui = player.gui.left
    if gui.personlaTeleportWindow ~= nil then
       gui.personlaTeleportWindow.destroy()
 
@@ -217,6 +229,7 @@ script.on_event(defines.events.on_gui_click, function(event)
         newName = cleanupName(newName)
         if newName ~= ""  then
           global.TelaportLocations[TelaportIndex][1] = newName
+          global.TelaportLocations[TelaportIndex][5].backer_name = newName
           player.gui.center.TelaportRenameWindow.destroy()
           guiTelSettingRenameWindowVisible = false
           if global.guiTelSetting.visiable == true then 
@@ -314,8 +327,10 @@ script.on_event(defines.events.on_built_entity, function(event)
       local surface = event.created_entity.surface.name
       
        initializeVaiables()
+      local TP_marker = event.created_entity.surface.create_entity({name="TP_marker",position = event.created_entity.position, force = game.forces.neutral})
+      TP_marker.backer_name = "x:"..x..",y:"..y..",s:"..surface
       
-      table.insert(global.TelaportLocations,{"x:"..x..",y:"..y..",s:"..surface,x,y,surface})
+      table.insert(global.TelaportLocations,{"x:"..x..",y:"..y..",s:"..surface,x,y,surface,TP_marker})
       global.TeleporterButtonActivated = true
       local playerNum = 1
       
@@ -357,7 +372,10 @@ script.on_event(defines.events.on_robot_built_entity, function(event)
       
        initializeVaiables()
       
-      table.insert(global.TelaportLocations,{"x:"..x..",y:"..y..",s:"..surface,x,y,surface})
+      local TP_marker = event.created_entity.surface.create_entity({name="TP_marker",position = event.created_entity.position, force = game.forces.neutral})
+      TP_marker.backer_name = "x:"..x..",y:"..y..",s:"..surface
+      
+      table.insert(global.TelaportLocations,{"x:"..x..",y:"..y..",s:"..surface,x,y,surface,TP_marker})
       global.TeleporterButtonActivated = true
       local playerNum = 1
       
@@ -445,6 +463,7 @@ function updateTelporterList()
 end
 
 function removeTelFromList(localTelIndex)
+  global.TelaportLocations[localTelIndex][5].destroy()
 	table.remove(global.TelaportLocations,localTelIndex)
 	if global.guiTelSetting.visiable == true then 
 		local playerNum1 = 1
