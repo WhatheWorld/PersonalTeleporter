@@ -71,7 +71,7 @@ data:extend({
 		order = "y",
 		selectable_in_game = false,
 		minable = {mining_time = 1, result = "train-stop"},
-		max_health = 0,
+		max_health = 1,
 		render_layer = "tile",
 		final_render_layer = "tile",
 		collision_box = {{0,0}, {0,0}},

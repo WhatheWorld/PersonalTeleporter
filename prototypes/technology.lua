@@ -36,7 +36,7 @@ data:extend({
           {"science-pack-1", 5},
           {"science-pack-2", 5},
           {"science-pack-3", 5},
-		  {"alien-science-pack", 5}
+		  {"high-tech-science-pack", 5}
         },
         time = 15
       }

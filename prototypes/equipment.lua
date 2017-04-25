@@ -28,7 +28,7 @@ data:extend(
 		  usage_priority = "primary-input"
 		},
 		max_shield_value = 0,
-		energy_per_shield = "0J",
+		energy_per_shield = ".01J",
     categories = {"armor"}
 	}
 
