@@ -25,7 +25,7 @@ data:extend({
 		energy_required = 1,
 		ingredients =
 		{
-			{type="item", name="alien-artifact", amount=2},
+			{type="item", name="uranium-238", amount=10},
 			{type="fluid", name="light-oil", amount=10}
 		},
 		results=
