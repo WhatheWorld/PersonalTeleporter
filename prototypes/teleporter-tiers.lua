@@ -23,7 +23,7 @@ data:extend({
     {
       type = "electric",
       buffer_capacity = TIER_01_BUFFER_CAPACITY.."MJ",
-      usage_priority = "terciary",
+      usage_priority = "secondary-input",
       input_flow_limit = TIER_01_FLOW_LIMIT.."MW",
       output_flow_limit = "0W"
     },

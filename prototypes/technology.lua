@@ -6,6 +6,7 @@ data:extend({
       type = "technology",
       name = "PersonalTeleportation",
       icon = "__PersonalTeleporter__/graphics/technology_icon.png",
+      icon_size = 128,
 	  effects =
 	  {
 	    {
