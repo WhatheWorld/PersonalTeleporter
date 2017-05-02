@@ -20,15 +20,15 @@ data:extend(
 		  height = 3,
 		  type = "full"
 		},
+    max_shield_value = 150,
 		energy_source =
 		{
 		  type = "electric",
 		  buffer_capacity = "10MJ",
-		  input_flow_limit = "75kW",
+		  input_flow_limit = "150kW",
 		  usage_priority = "primary-input"
 		},
-		max_shield_value = 0,
-		energy_per_shield = ".01J",
+    energy_per_shield = "30kJ",
     categories = {"armor"}
 	}
 
