@@ -73,9 +73,6 @@ end
 
 
 function creatTelportWindow(Parplayer)
-
-
-
    local player = Parplayer
       local gui = player.gui.left
    if gui.personlaTeleportWindow ~= nil then
@@ -119,8 +116,6 @@ if Count %10 == 0 then
 end
 
 script.on_event(defines.events.on_gui_click, function(event)
-  local refreshWindow = false
-  local refreshWindows = false
   local player = game.players[event.element.player_index]
   
   if event.element.name == "PersonalTeleportTool" and global.guiTelSetting.visiable == false then
@@ -189,18 +184,16 @@ script.on_event(defines.events.on_gui_click, function(event)
       end
     
   elseif endsWith(event.element.name, "_TelaportRename") then
-    if guiTelSettingRenameWindowVisible then
+    if isTeleporterRenameWindowOpen(player) then
       return
     end
     local data = split(event.element.name,"_")
     local telaportLocIndex = tonumber(data[1])
-    guiTelSettingRenameWindowVisible = true
     createTelaPortRenameWindow(player.gui.center,telaportLocIndex,global.TelaportLocations[telaportLocIndex][1])
    
   elseif event.element.name == "TelaportRenameCancel" then
-    if guiTelSettingRenameWindowVisible then
+    if isTeleporterRenameWindowOpen(player) then
       player.gui.center.TelaportRenameWindow.destroy()
-      guiTelSettingRenameWindowVisible = false
     end
    
    elseif event.element.name == "teleportPageBack" then
@@ -222,7 +215,7 @@ script.on_event(defines.events.on_gui_click, function(event)
  elseif endsWith(event.element.name,"_TelaportRenameOK") then
     local data = split(event.element.name,"_")
     local TelaportIndex = data[1]
-    if guiTelSettingRenameWindowVisible and TelaportIndex ~= nil then
+    if isTeleporterRenameWindowOpen(player) and TelaportIndex ~= nil then
       TelaportIndex = tonumber(TelaportIndex)
       local newName = player.gui.center.TelaportRenameWindow.TelaportRenameText.text
       if newName ~= nil then
@@ -231,7 +224,6 @@ script.on_event(defines.events.on_gui_click, function(event)
           global.TelaportLocations[TelaportIndex][1] = newName
           global.TelaportLocations[TelaportIndex][5].backer_name = newName
           player.gui.center.TelaportRenameWindow.destroy()
-          guiTelSettingRenameWindowVisible = false
           if global.guiTelSetting.visiable == true then 
             creatTelportWindow(game.players[1])
           end
@@ -485,4 +477,11 @@ function split(stringA, sep)
   local pattern = string.format("([^%s]+)", sep)
   string.gsub(stringA, pattern, function(c) fields[#fields+1] = c end)
   return fields
+end
+
+function isTeleporterRenameWindowOpen(player)
+  if player.gui.center.TelaportRenameWindow == nil then
+    return false
+  end
+  return true
 end
