@@ -12,6 +12,7 @@ data:extend({
 		order = "a[items]-b[Teleporter_Beacon]",
 		place_result="Teleporter_Beacon",
 		stack_size= 2,
+    icon_size = 32,
 	},
   
   
@@ -26,6 +27,7 @@ data:extend({
 	icon = "__PersonalTeleporter__/graphics/liquid-alien.png",
 	pressure_to_speed_ratio = 0.4,
 	flow_to_energy_ratio = 0.59,
+    icon_size = 32,
 	order = "a[fluid]-y[liquid-alien-artifacts]"
   },
   {
@@ -35,6 +37,7 @@ data:extend({
 	icon = "__PersonalTeleporter__/graphics/teleporter-core.png",
 	flags = { "goes-to-main-inventory" },
 	order = "a[items]-c[TeleporterCore]",
+    icon_size = 32,
 	stack_size = 16
   },
   
@@ -50,6 +53,7 @@ data:extend({
 	subgroup = "equipment",
 	order = "g-a-a",
 	stack_size= 1,
+    icon_size = 32,
 	  
   }
   
