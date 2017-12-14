@@ -11,6 +11,7 @@ data:extend({
     type = "accumulator",
     name = "Teleporter_Beacon",
     icon = "__PersonalTeleporter__/graphics/icon.png",
+    icon_size = 32,
     flags = {"placeable-neutral", "player-creation"},
     minable = {hardness = 0.2, mining_time = 0.5, result = "Teleporter_Beacon"},
     max_health = 150,
@@ -79,6 +80,7 @@ data:extend({
 		drawing_box = {{0,0}, {0,0}},
 		tile_width = 1,
 		tile_height = 1,
+    icon_size = 32,
 		animation_ticks_per_frame = 0,
 	
 		vehicle_impact_sound =	{ filename = "__base__/sound/car-metal-impact.ogg", volume = 0 },
@@ -87,13 +89,7 @@ data:extend({
 			sound = { filename = "__base__/sound/train-stop.ogg", volume = 0 }
 		},
 		circuit_wire_connection_points = {},
-		circuit_connector_sprites =
-		{
-			get_circuit_connector_sprites({0.5625-1, 1.03125}, {0.5625-1, 1.03125}, 0), --N
-			get_circuit_connector_sprites({-0.78125, 0.28125-1}, {-0.78125, 0.28125-1}, 6), --E
-			get_circuit_connector_sprites({-0.28125+1, 0.28125}, {-0.28125+1, 0.28125}, 0), --S
-			get_circuit_connector_sprites({0.03125, 0.28125+1}, {0.03125, 0.28125+1}, 6), --W
-		},
+		circuit_connector_sprites = circuit_connector_definitions["train-station"].sprites,
 	}
   
   

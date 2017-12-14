@@ -2,9 +2,10 @@
 
 
 
+
 data.raw["gui-style"].default["blueprint_thin_flow"] =
     {
-      type = "flow_style",
+      type = "vertical_flow_style",
       horizontal_spacing = 0,
       vertical_spacing = 0,
       max_on_row = 0,
@@ -13,7 +14,7 @@ data.raw["gui-style"].default["blueprint_thin_flow"] =
 data.raw["gui-style"].default["blueprint_thin_frame"] =
     {
       type = "frame_style",
-	  parent="frame_style",
+	  parent="frame",
       top_padding  = 2,
 	  bottom_padding = 2,
     }
@@ -21,29 +22,23 @@ data.raw["gui-style"].default["blueprint_thin_frame"] =
 data.raw["gui-style"].default["blueprint_main_frame"] =
     {
       type = "frame_style",
-	  parent="frame_style",
+	  parent="frame",
       top_padding  = 0,
 	  bottom_padding = 0,
     }
 	
 	data.raw["gui-style"].default["blueprint_button_flow"] =
     {
-      type = "flow_style",
-	  parent="flow_style",
-	  horizontal_spacing=1,
-    }
-	
-	data.raw["gui-style"].default["blueprint_info_button_flow"] =
-    {
-      type = "flow_style",
-	  parent="blueprint_button_flow",
-      top_padding  = 4,
+      type = "horizontal_flow_style",
+	    horizontal_spacing = default_container_padding,
+      vertical_spacing = default_container_padding,
+	    horizontal_spacing=1,
     }
 	
 data.raw["gui-style"].default["blueprint_button_style"] =
     {
       type = "button_style",
-      parent = "button_style",
+      parent = "button",
 	  top_padding = 1,
       right_padding = 5,
       bottom_padding = 1,
