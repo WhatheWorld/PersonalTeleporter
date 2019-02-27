@@ -217,10 +217,10 @@ script.on_event(defines.events.on_gui_click, function(event)
                     equip.energy = equip.energy - 2000000
                     if TelporterLocation[4] ~= nil then
                       game.players[event.element.player_index].print("TP to: " .. TelporterLocation[2] .. ", " .. TelporterLocation[3] .. ", " .. TelporterLocation[4] .. ".")
-                      game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]},TelporterLocation[4])
+                      game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]-.5},TelporterLocation[4])
                     else
                       game.players[event.element.player_index].print("TP to: " .. TelporterLocation[2] .. ", " .. TelporterLocation[3] .. ".")
-                      game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]},"nauvis")
+                      game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]-.5},"nauvis")
                     end
                   end
                 end
@@ -349,30 +349,35 @@ script.on_event(defines.events.on_gui_click, function(event)
     local CategoryCurrentName = data[1]
     local newName = player.gui.center.TelaportCategorySettingWindow.TelaportCategorySettingText.text
     newName = cleanupName(newName)
-    for i,category in ipairs(global.Categories) do
-      if category.name == newName then 
-        player.gui.center.TelaportCategorySettingWindow.destroy()
-        guiTelSettingCategorySettingWindowVisible = false
-        player.print("can't rename Category to a name that already exist")
-        return
+    if newName ~= nil and newName ~= '' then
+      for i,category in ipairs(global.Categories) do
+        if category.name == newName then 
+          player.gui.center.TelaportCategorySettingWindow.destroy()
+          guiTelSettingCategorySettingWindowVisible = false
+          player.print("can't rename Category to a name that already exist")
+          return
+        end
       end
-    end
-    for i,category in ipairs(global.Categories) do 
-      if category.name == CategoryCurrentName then 
-        category.name = newName
-      end
-    end
-    for i,telaportLoc in ipairs(global.TelaportLocations) do 
-      for x,category in ipairs(telaportLoc[6]) do 
-        if category.name == CategoryCurrentName then
+      for i,category in ipairs(global.Categories) do 
+        if category.name == CategoryCurrentName then 
           category.name = newName
         end
       end
+      for i,telaportLoc in ipairs(global.TelaportLocations) do 
+        for x,category in ipairs(telaportLoc[6]) do 
+          if category.name == CategoryCurrentName then
+            category.name = newName
+          end
+        end
+      end
+      setPlayerCategory(player,newName)
+      player.gui.center.TelaportCategorySettingWindow.destroy()
+      guiTelSettingCategorySettingWindowVisible = false
+      creatTelportWindow(player)
+    else
+      --alert that player can not input black string as category name
+      game.players[event.element.player_index].print("can't have a blank category name.")
     end
-    setPlayerCategory(player,newName)
-    player.gui.center.TelaportCategorySettingWindow.destroy()
-    guiTelSettingCategorySettingWindowVisible = false
-    creatTelportWindow(player)
     
   elseif endsWith(event.element.name,"_TelaportSetCategory") then 
     if guiTelSettingSetCategoryWindowVisible == false or guiTelSettingSetCategoryWindowVisible == nil then
@@ -431,17 +436,23 @@ script.on_event(defines.events.on_gui_click, function(event)
   
   elseif endsWith(event.element.name , "_TelaportCategoryAddOK") then 
     local categoryName = player.gui.center.TelaportCategoryAddWindow.TelaportCategoryAddText.text
-    addCategory(categoryName)
-    if global.guiTelSetting.visiable == true then 
-      local playerNum1 = 1
-      while game.players[playerNum1] do
-        creatTelportWindow(game.players[playerNum1])
-        playerNum1 = playerNum1 +1
+    if categoryName ~= nil and categoryName ~= '' then
+      if not categoryNameAllreadyExist(categoryName,player) then
+        addCategory(categoryName)
+        if global.guiTelSetting.visiable == true then 
+          local playerNum1 = 1
+          while game.players[playerNum1] do
+            creatTelportWindow(game.players[playerNum1])
+            playerNum1 = playerNum1 +1
+          end
+        end
+        player.gui.center.TelaportCategoryAddWindow.destroy()
+        guiTelSettingCategoryAddWindowVisible = false
       end
+    else 
+      --alert that player can not input black string as category name
+      game.players[event.element.player_index].print("can't have a blank category name.")
     end
-    player.gui.center.TelaportCategoryAddWindow.destroy()
-    guiTelSettingCategoryAddWindowVisible = false
-    
   end
 end)
   
@@ -748,3 +759,15 @@ function callapseAllCategorys()
     callapseCategory(catagory.name)
   end
 end
+
+function categoryNameAllreadyExist(newCategoryName,player)
+  newName = newCategoryName
+    for i,category in ipairs(global.Categories) do
+      if category.name == newName then
+        player.print("can't rename Category to a name that already exist")
+        return true
+      end
+    end
+    return false
+end
+
