@@ -8,7 +8,6 @@ data:extend({
 		name = "Teleporter_Beacon",
 		subgroup = "production-machine",
 		icon = "__PersonalTeleporter__/graphics/icon.png",
-		flags = { "goes-to-quickbar" },
 		order = "a[items]-b[Teleporter_Beacon]",
 		place_result="Teleporter_Beacon",
 		stack_size= 2,
@@ -35,7 +34,6 @@ data:extend({
 	name = "TeleporterCore",
 	subgroup = "intermediate-product",
 	icon = "__PersonalTeleporter__/graphics/teleporter-core.png",
-	flags = { "goes-to-main-inventory" },
 	order = "a[items]-c[TeleporterCore]",
     icon_size = 32,
 	stack_size = 16
@@ -48,7 +46,6 @@ data:extend({
 	type = "item",
 	name = "Personal-Teleporter",
 	icon = "__PersonalTeleporter__/graphics/Personal_Teleporter_item.png",
-	flags = {"goes-to-main-inventory"},
 	placed_as_equipment_result = "Personal-Teleporter",
 	subgroup = "equipment",
 	order = "g-a-a",
