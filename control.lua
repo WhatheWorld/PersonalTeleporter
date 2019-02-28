@@ -114,8 +114,16 @@ end
 
 
 function creatTelportWindow(Parplayer)
+
   local player = Parplayer
   local gui = player.gui.left
+
+  if global.TeleporterButtonActivated == false then
+    if gui.personlaTeleportWindow ~= nil then
+      gui.personlaTeleportWindow.destroy()
+    end
+    return false;
+  end
   
   if gui.personlaTeleportWindow ~= nil then
     gui.personlaTeleportWindow.destroy()
