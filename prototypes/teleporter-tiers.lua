@@ -1,14 +1,10 @@
 --A lot of Thanks to iUltimateLP and his mod SimpleTeleporters for inspiration and for the use of His Code and graphics
 
-
-
-require("config")
-
 DIVIDER = 60
 
 data:extend({
   {
-    type = "accumulator",
+    type = "electric-energy-interface",
     name = "Teleporter_Beacon",
     icon = "__PersonalTeleporter__/graphics/icon.png",
     icon_size = 32,
@@ -23,9 +19,9 @@ data:extend({
     energy_source =
     {
       type = "electric",
-      buffer_capacity = TIER_01_BUFFER_CAPACITY.."MJ",
+      buffer_capacity = "60MJ",
       usage_priority = "secondary-input",
-      input_flow_limit = TIER_01_FLOW_LIMIT.."MW",
+      input_flow_limit = "1MW",
       output_flow_limit = "0W"
     },
     picture =
