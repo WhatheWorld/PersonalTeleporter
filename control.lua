@@ -1,25 +1,34 @@
 --A lot of Thanks to iUltimateLP and his mod SimpleTeleporters for inspiration and for the use of His Code and graphics
+if not personalTeleporter then personalTeleporter = {} end
+if not personalTeleporter.config then personalTeleporter.config = {} end
+require("config")
+require("util")
 
+personalTeleporterButtonNamePrefix = "personalTeleporter"
+--button name should go as follows 
+--personalTeleporter_ButtonName/discription_numberIfNeeded
+function createButtonName(ButtonNameDiscription,number)
+  local buttonName = personalTeleporterButtonNamePrefix .. "_" .. ButtonNameDiscription
+  if number then 
+    buttonName = buttonName .. "_" .. number
+  end
+  return buttonName
+end
 
-require "config"
-require "util"
 function createTeleportButton(player)
   if player ~= nil then
     local topGui = player.gui.top
     if not topGui.PersonalTeleportTool  then
       topGui.add({type="button", name="PersonalTeleportTool", caption = "Teleport", style="blueprint_button_style"})
-      --guiSettings.foremanVisable = true
     end
   end
 end
 
 script.on_init(function()
    initializeVaiables()
-  --createTeleportButton(game.players[1])
 end)
 script.on_configuration_changed(function()
    initializeVaiables()
-  --createTeleportButton(game.players[1])
 end)
 
 script.on_event(defines.events.on_player_created, function(event)
@@ -54,7 +63,7 @@ function initializeVaiables()
         --global.TelaportLocations[x][4] = surface
         --global.TelaportLocations[x][5] = maker entity
         --global.telaportLocations[x][6] = array of categories starting at position 1 currently only one allowed
-                           --category[x] = is  (name,position)
+        --global.telaportLocations[x][6][x]= is  (name,position)
     else
       for i,telaportLoc in ipairs(global.TelaportLocations) do
         if telaportLoc[5] == nil then
@@ -121,6 +130,7 @@ function creatTelportWindow(Parplayer)
   if global.TeleporterButtonActivated == false then
     if gui.personlaTeleportWindow ~= nil then
       gui.personlaTeleportWindow.destroy()
+      global.guiTelSetting.visiable = false
     end
     return false;
   end
@@ -130,7 +140,8 @@ function creatTelportWindow(Parplayer)
   end
 
   global.guiTelSetting.visiable = true
-  local localTelaportLocations = getTelaportLocations(getPlayerCategory(player))
+  playersCurrentCategory = getPlayerCategory(player)
+  local localTelaportLocations = getTelaportLocations(playersCurrentCategory)
   local numberOfTelaporters = tableSize(localTelaportLocations)
 
   local window = gui.add({type="flow", name="personlaTeleportWindow", direction="vertical", style="blueprint_thin_flow"})
@@ -143,19 +154,29 @@ function creatTelportWindow(Parplayer)
     Count = Count + 1
   end
   
-  if Count %10 == 0 then
-    Count = Count /10
+  local teleporterPerPage = personalTeleporter.config.teleporterPerPage
+  
+  if Count %teleporterPerPage == 0 then
+    Count = Count /teleporterPerPage
   else
-    Count = Count /10
+    Count = Count /teleporterPerPage
     Count = math.floor((Count) +1)
   end
   local playerPage = getPlayerPage(player)
+  if playerPage > Count then
+    playerPage = Count
+    setPlayerPage( player , playerPage )
+  end
   buttonFlow.add({type="button", name="teleportPageBack", caption="<", style="blueprint_button_style"})
   buttonFlow.add({type="label", name="TelaportInfoPages", caption=playerPage.."/"..Count, style="blueprint_label_style"})
   buttonFlow.add({type="button", name="teleportPageForward", caption=">", style="blueprint_button_style"})
   
   for i,category in ipairs(global.Categories) do
-    buttonFlow.add({type="button", name=category.name.."_teleportCategory", caption=category.name, style="blueprint_button_style"})
+    if category.name == playersCurrentCategory then 
+      buttonFlow.add({type="button", name=category.name.."_teleportCategory", caption=category.name, style="blueprint_button_style_bold"})
+    else
+      buttonFlow.add({type="button", name=category.name.."_teleportCategory", caption=category.name, style="blueprint_button_style"})
+    end
   end
   
   if tableSize(global.Categories) < 5 then 
@@ -164,10 +185,10 @@ function creatTelportWindow(Parplayer)
   
   displayed = 0
   for i,telaportLoc in pairs(localTelaportLocations) do
-    if (i > (playerPage -1) *10) then
+    if (i > (playerPage -1) *teleporterPerPage) then
       displayed = displayed + 1
       createTelaPortLocationFrame(telaportLoc,i,window,numberOfTelaporters)
-      if displayed >= 10 then
+      if displayed >= teleporterPerPage then
         break
       end
     end
@@ -219,15 +240,15 @@ script.on_event(defines.events.on_gui_click, function(event)
               local localEntities = game.surfaces[teleportSurface].find_entities({{TelporterLocation[2]-1,TelporterLocation[3]+1},{TelporterLocation[2]+1,TelporterLocation[3]-1}})
               for x,entity in ipairs(localEntities) do
                 if string.find(entity.name,"Teleporter_Beacon")  then
-                  if entity.energy > 10000 then
+                  if entity.energy > 10000000 then
                     TBHasEnergy = true
                     entity.energy = entity.energy - 10000000
                     equip.energy = equip.energy - 2000000
                     if TelporterLocation[4] ~= nil then
-                      game.players[event.element.player_index].print("TP to: " .. TelporterLocation[2] .. ", " .. TelporterLocation[3] .. ", " .. TelporterLocation[4] .. ".")
+                      game.players[event.element.player_index].print("TP to: " .. TelporterLocation[1])
                       game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]-.5},TelporterLocation[4])
                     else
-                      game.players[event.element.player_index].print("TP to: " .. TelporterLocation[2] .. ", " .. TelporterLocation[3] .. ".")
+                      game.players[event.element.player_index].print("TP to: " .. TelporterLocation[1])
                       game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]-.5},"nauvis")
                     end
                   end
@@ -461,6 +482,29 @@ script.on_event(defines.events.on_gui_click, function(event)
       --alert that player can not input black string as category name
       game.players[event.element.player_index].print("can't have a blank category name.")
     end
+    
+  elseif string.find(event.element.name , "TeleporterCategorySettingDelete") ~= nil then
+    local data = split(event.element.name,"_")
+    local CategoryCurrentName = data[3]
+    local canDelete = true
+    if tableSize(getTelaportLocations(CategoryCurrentName)) > 0 then
+      --alert that player can not categories that still have teleporters in it
+      game.players[event.element.player_index].print("can't delete category: " .. CategoryCurrentName .. " because it's not empty.")
+      canDelete = false
+    elseif tableSize(global.Categories) == 1 then
+      game.players[event.element.player_index].print("can't delete category: " .. CategoryCurrentName .. " because it is the only category.")
+    else
+      for i,catagory in pairs(global.Categories) do 
+        if catagory.name == CategoryCurrentName then
+          table.remove(global.Categories,i)
+          setPlayerCategory( player , global.Categories[1].name )
+          creatTelportWindow(player)
+        end
+      end
+    end
+    --setPlayerCategory(player,newName)
+    player.gui.center.TelaportCategorySettingWindow.destroy()
+    guiTelSettingCategorySettingWindowVisible = false
   end
 end)
   
@@ -597,7 +641,7 @@ function updateTelporterList()
       local destoryed = true
       for x,entity in ipairs(localEntities) do
         if string.find(entity.name,"Teleporter_Beacon") then
-          if entity.type == "accumulator" then
+          if entity.type == "electric-energy-interface" then
             if entity.health > 0 then
               destoryed = false
             end
@@ -664,6 +708,7 @@ function createCategorySettingWindow(gui,oldName)
 
   local flow = frame.add({type="flow", name="TelaportCategorySettingFlow", direction="horizontal"})
   flow.add({type="button", name="TelaportCategorySettingCancel", caption="Cancel"})
+  flow.add({type="button", name=createButtonName("TeleporterCategorySettingDelete",oldName), caption="Delete"})
   flow.add({type="button", name=oldName .. "_TelaportCategorySettingOK" , caption="OK"})
 
   return frame

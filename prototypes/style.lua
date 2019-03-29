@@ -53,6 +53,13 @@ data.raw["gui-style"].default["blueprint_button_style"] =
         }
       }
     }
+    
+data.raw["gui-style"].default["blueprint_button_style_bold"] =
+{
+  type = "button_style",
+  parent = "blueprint_button_style",
+  font = "default-large-bold"
+}
 	
 data.raw["gui-style"].default["blueprint_disabled_button"] =
     {
