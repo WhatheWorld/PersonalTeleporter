@@ -6,3 +6,10 @@
 --default value 10
 personalTeleporter.config.teleporterPerPage = 10
 
+--the energy the Teleport Beacon needs to teleport to in J
+--default value 10000000
+personalTeleporter.config.energyCostToTeleportBeacon = 10000000
+
+--the energy the Teleport Equipment needs to teleport in J
+--default value 2000000
+personalTeleporter.config.energyCostToTeleportEquipment = 2000000
