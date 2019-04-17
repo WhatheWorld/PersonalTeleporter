@@ -224,7 +224,7 @@ script.on_event(defines.events.on_gui_click, function(event)
         for indexE,equip in pairs(equipment) do
           if equip.name == "Personal-Teleporter" then
             noPT = false
-            if equip.energy > 2000000 then
+            if equip.energy > personalTeleporter.config.energyCostToTeleportEquipment then
               PTHasEnergy = true
               local data = split(event.element.name,"_")
               local telaportLocIndex = tonumber(data[1])
@@ -240,10 +240,10 @@ script.on_event(defines.events.on_gui_click, function(event)
               local localEntities = game.surfaces[teleportSurface].find_entities({{TelporterLocation[2]-1,TelporterLocation[3]+1},{TelporterLocation[2]+1,TelporterLocation[3]-1}})
               for x,entity in ipairs(localEntities) do
                 if string.find(entity.name,"Teleporter_Beacon")  then
-                  if entity.energy > 10000000 then
+                  if entity.energy > personalTeleporter.config.energyCostToTeleportBeacon then
                     TBHasEnergy = true
-                    entity.energy = entity.energy - 10000000
-                    equip.energy = equip.energy - 2000000
+                    entity.energy = entity.energy - personalTeleporter.config.energyCostToTeleportBeacon
+                    equip.energy = equip.energy - personalTeleporter.config.energyCostToTeleportEquipment
                     if TelporterLocation[4] ~= nil then
                       game.players[event.element.player_index].print("TP to: " .. TelporterLocation[1])
                       game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]-.5},TelporterLocation[4])
@@ -266,9 +266,9 @@ script.on_event(defines.events.on_gui_click, function(event)
       if noPT then
          player.print("You need a Personal Teleporter in you Power Armour before you can Teleport")
       elseif PTHasEnergy == false then
-         player.print("Not enough energy in Personal Telaporter, it takes 2MJ to teleport")
+         player.print("Not enough energy in Personal Telaporter, it takes ".. personalTeleporter.config.energyCostToTeleportEquipment/1000000 .. "MJ to teleport")
       elseif TBHasEnergy == false then
-         player.print("The Teleporter Beacon at your requested destination does not have enough energy, it needs 10MJ")
+         player.print("The Teleporter Beacon at your requested destination does not have enough energy, it needs " .. personalTeleporter.config.energyCostToTeleportBeacon/1000000 .. "MJ")
       end
     
   elseif endsWith(event.element.name, "_TelaportRename") then

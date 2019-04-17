@@ -28,16 +28,16 @@ data:extend({
 		},
 		
 	  },
-      prerequisites = {"automation-3", "electronics", "circuit-network","fusion-reactor-equipment","rocket-silo"},
+      prerequisites = {"automation-3","fusion-reactor-equipment","uranium-processing","rocket-control-unit"},
       unit =
       {
         count = 2000,
         ingredients =
         {
-          {"automation-science-pack", 5},
-          {"logistic-science-pack", 5},
-          {"chemical-science-pack", 5},
-		      {"utility-science-pack", 5}
+          {"automation-science-pack", 1},
+          {"logistic-science-pack", 1},
+          {"chemical-science-pack", 1},
+		      {"utility-science-pack", 1}
         },
         time = 15
       }
