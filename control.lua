@@ -272,18 +272,16 @@ script.on_event(defines.events.on_gui_click, function(event)
       end
     
   elseif endsWith(event.element.name, "_TelaportRename") then
-    if guiTelSettingRenameWindowVisible then
+    if player.gui.center.TelaportRenameWindow ~= nill then
       return
     end
     local data = split(event.element.name,"_")
     local telaportLocIndex = tonumber(data[1])
-    guiTelSettingRenameWindowVisible = true
     createTelaPortRenameWindow(player.gui.center,telaportLocIndex,getTelaporter(player , telaportLocIndex)[1])
    
   elseif event.element.name == "TelaportRenameCancel" then
-    if guiTelSettingRenameWindowVisible then
+    if player.gui.center.TelaportRenameWindow ~= nill then
       player.gui.center.TelaportRenameWindow.destroy()
-      guiTelSettingRenameWindowVisible = false
     end
    
    elseif event.element.name == "teleportPageBack" then
@@ -305,7 +303,7 @@ script.on_event(defines.events.on_gui_click, function(event)
  elseif endsWith(event.element.name,"_TelaportRenameOK") then
     local data = split(event.element.name,"_")
     local TelaportIndex = data[1]
-    if guiTelSettingRenameWindowVisible and TelaportIndex ~= nil then
+    if player.gui.center.TelaportRenameWindow ~= nill and TelaportIndex ~= nil then
       TelaportIndex = tonumber(TelaportIndex)
       local newName = player.gui.center.TelaportRenameWindow.TelaportRenameText.text
       if newName ~= nil then
@@ -314,7 +312,6 @@ script.on_event(defines.events.on_gui_click, function(event)
           getTelaporter(player , TelaportIndex)[1] = newName
           getTelaporter(player , TelaportIndex)[5].backer_name = newName
           player.gui.center.TelaportRenameWindow.destroy()
-          guiTelSettingRenameWindowVisible = false
           if global.guiTelSetting.visiable == true then 
             creatTelportWindow(player)
           end
@@ -357,8 +354,7 @@ script.on_event(defines.events.on_gui_click, function(event)
   elseif endsWith(event.element.name,"_teleportCategory") then 
     local data = split(event.element.name,"_")
     local categoryName = data[1]
-    if categoryName == getPlayerCategory(player) and (guiTelSettingCategorySettingWindowVisible == false or guiTelSettingCategorySettingWindowVisible == nil )then 
-      guiTelSettingCategorySettingWindowVisible = true
+    if categoryName == getPlayerCategory(player) and (player.gui.center.TelaportCategorySettingWindow == nill)then 
       createCategorySettingWindow(player.gui.center,categoryName)
       return
     end
@@ -368,9 +364,8 @@ script.on_event(defines.events.on_gui_click, function(event)
     end
   
   elseif endsWith(event.element.name , "TelaportCategorySettingCancel") then 
-    if guiTelSettingCategorySettingWindowVisible then
+    if player.gui.center.TelaportCategorySettingWindow ~= nill then
       player.gui.center.TelaportCategorySettingWindow.destroy()
-      guiTelSettingCategorySettingWindowVisible = false
     end
     
   elseif endsWith(event.element.name , "TelaportCategorySettingOK") then
@@ -382,7 +377,6 @@ script.on_event(defines.events.on_gui_click, function(event)
       for i,category in ipairs(global.Categories) do
         if category.name == newName then 
           player.gui.center.TelaportCategorySettingWindow.destroy()
-          guiTelSettingCategorySettingWindowVisible = false
           player.print("can't rename Category to a name that already exist")
           return
         end
@@ -401,7 +395,6 @@ script.on_event(defines.events.on_gui_click, function(event)
       end
       setPlayerCategory(player,newName)
       player.gui.center.TelaportCategorySettingWindow.destroy()
-      guiTelSettingCategorySettingWindowVisible = false
       creatTelportWindow(player)
     else
       --alert that player can not input black string as category name
@@ -409,17 +402,15 @@ script.on_event(defines.events.on_gui_click, function(event)
     end
     
   elseif endsWith(event.element.name,"_TelaportSetCategory") then 
-    if guiTelSettingSetCategoryWindowVisible == false or guiTelSettingSetCategoryWindowVisible == nil then
+    if player.gui.center.TelaportSetCategoryWindow == nil then
       local data = split(event.element.name,"_")
       local categoryPosition = data[1] 
       createTelaportSetCategoryWindow(player.gui.center ,categoryPosition, getPlayerCategory(player))
-      guiTelSettingSetCategoryWindowVisible = true
     end
     
   elseif endsWith(event.element.name , "TelaportSetCategoryCancel") then 
-    if guiTelSettingSetCategoryWindowVisible then
+    if player.gui.center.TelaportSetCategoryWindow ~= nil then
       player.gui.center.TelaportSetCategoryWindow.destroy()
-      guiTelSettingSetCategoryWindowVisible = false
     end
     
   elseif endsWith(event.element.name , "_TelaportSetCategoryOK") then 
@@ -441,7 +432,6 @@ script.on_event(defines.events.on_gui_click, function(event)
     end
     callapseCategory(currentCategory)
     player.gui.center.TelaportSetCategoryWindow.destroy()
-    guiTelSettingSetCategoryWindowVisible = false
     
     if global.guiTelSetting.visiable == true then 
       local playerNum1 = 1
@@ -452,15 +442,13 @@ script.on_event(defines.events.on_gui_click, function(event)
     end
     
   elseif endsWith( event.element.name ,"teleportCategoryAdd") then
-    if guiTelSettingCategoryAddWindowVisible == false or guiTelSettingCategoryAddWindowVisible == nil then
+    if player.gui.center.TelaportCategoryAddWindow == nil then
       createTelaportCategoryAddWindow(player.gui.center)
-      guiTelSettingCategoryAddWindowVisible = true
     end
   
   elseif endsWith(event.element.name , "TelaportCategoryAddCancel") then 
-    if guiTelSettingCategoryAddWindowVisible then
+    if player.gui.center.TelaportCategoryAddWindow ~= nil then
       player.gui.center.TelaportCategoryAddWindow.destroy()
-      guiTelSettingCategoryAddWindowVisible = false
     end
   
   elseif endsWith(event.element.name , "_TelaportCategoryAddOK") then 
@@ -476,7 +464,6 @@ script.on_event(defines.events.on_gui_click, function(event)
           end
         end
         player.gui.center.TelaportCategoryAddWindow.destroy()
-        guiTelSettingCategoryAddWindowVisible = false
       end
     else 
       --alert that player can not input black string as category name
@@ -504,7 +491,6 @@ script.on_event(defines.events.on_gui_click, function(event)
     end
     --setPlayerCategory(player,newName)
     player.gui.center.TelaportCategorySettingWindow.destroy()
-    guiTelSettingCategorySettingWindowVisible = false
   end
 end)
   
