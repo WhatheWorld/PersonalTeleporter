@@ -762,8 +762,8 @@ function recreateOpenWindows()
   while game.players[playerNum1] do
     if game.players[playerNum1].gui.left.personlaTeleportWindow ~= nil then
       creatTelportWindow(game.players[playerNum1])
-      playerNum1 = playerNum1 +1
     end
+    playerNum1 = playerNum1 +1
   end
 end
 
