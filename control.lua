@@ -63,7 +63,7 @@ function initializeVaiables()
         --global.TelaportLocations[x][4] = surface
         --global.TelaportLocations[x][5] = maker entity
         --global.telaportLocations[x][6] = array of categories starting at position 1 currently only one allowed
-        --global.telaportLocations[x][6][x]= is  (name,position)
+        --global.telaportLocations[x][6][x]= is  (Categorie name,position)
     else
       for i,telaportLoc in ipairs(global.TelaportLocations) do
         if telaportLoc[5] == nil then
@@ -76,12 +76,7 @@ function initializeVaiables()
         end
       end
     end
-  if global.guiTelSetting == nil then
-     global.guiTelSetting = {}
-     global.guiTelSetting.visiable = false
-     global.guiTelSetting.window = nil
-     
-  end
+    
   if global.TelaportLocations[0] ~= nil and  global.TelaportLocations[0][6] == nil then
     for i, telaportLoc in ipairs(global.TelaportLocations) do
       if telaportLoc[6] == nil then
@@ -113,11 +108,7 @@ function initializeVaiables()
   end
   
   if remakeWindow then
-    local playerNum5 = 1
-    while game.players[playerNum5] do
-       creatTelportWindow(game.players[playerNum5])
-       playerNum5 = playerNum5 +1
-    end
+    recreateOpenWindows()
   end
 end
 
@@ -130,7 +121,6 @@ function creatTelportWindow(Parplayer)
   if global.TeleporterButtonActivated == false then
     if gui.personlaTeleportWindow ~= nil then
       gui.personlaTeleportWindow.destroy()
-      global.guiTelSetting.visiable = false
     end
     return false;
   end
@@ -139,13 +129,11 @@ function creatTelportWindow(Parplayer)
     gui.personlaTeleportWindow.destroy()
   end
 
-  global.guiTelSetting.visiable = true
   playersCurrentCategory = getPlayerCategory(player)
   local localTelaportLocations = getTelaportLocations(playersCurrentCategory)
   local numberOfTelaporters = tableSize(localTelaportLocations)
 
   local window = gui.add({type="flow", name="personlaTeleportWindow", direction="vertical", style="blueprint_thin_flow"})
-  global.guiTelSetting.window = window
   local buttons = window.add({type="frame", name="blueprintButtons", direction="horizontal", style="blueprint_thin_frame"})
   local buttonFlow = buttons.add({type="flow", name="pageButtonFlow", direction="horizontal", style="blueprint_button_flow"})
   local Count = 0
@@ -202,13 +190,11 @@ script.on_event(defines.events.on_gui_click, function(event)
   local playerPage = getPlayerPage(player)
   local playerCategory = getPlayerCategory(player)
   
-  if event.element.name == "PersonalTeleportTool" and global.guiTelSetting.visiable == false then
+  if event.element.name == "PersonalTeleportTool" and player.gui.left.personlaTeleportWindow == nil then
     creatTelportWindow(player)
   
-  elseif event.element.name == "PersonalTeleportTool" and global.guiTelSetting.visiable == true then
+  elseif event.element.name == "PersonalTeleportTool" and player.gui.left.personlaTeleportWindow ~= nil then
     --close window
-    global.guiTelSetting.visiable = false;
-    global.guiTelSetting.window.destroy()
     local gui = player.gui.left
     if gui.personlaTeleportWindow ~= nil then
       gui.personlaTeleportWindow.destroy()
@@ -218,9 +204,9 @@ script.on_event(defines.events.on_gui_click, function(event)
      local noPT = true
      local PTHasEnergy = false
      local TBHasEnergy = false
-     if player.get_inventory(defines.inventory.player_armor)[1].valid_for_read then    --get_item_count("Personal-Teleporter") > 0 then
-      if player.get_inventory(defines.inventory.player_armor)[1].grid then
-        local equipment = player.get_inventory(defines.inventory.player_armor)[1].grid.equipment
+     if player.get_inventory(defines.inventory.character_armor)[1].valid_for_read then    --get_item_count("Personal-Teleporter") > 0 then
+      if player.get_inventory(defines.inventory.character_armor)[1].grid then
+        local equipment = player.get_inventory(defines.inventory.character_armor)[1].grid.equipment
         for indexE,equip in pairs(equipment) do
           if equip.name == "Personal-Teleporter" then
             noPT = false
@@ -246,10 +232,10 @@ script.on_event(defines.events.on_gui_click, function(event)
                     equip.energy = equip.energy - personalTeleporter.config.energyCostToTeleportEquipment
                     if TelporterLocation[4] ~= nil then
                       game.players[event.element.player_index].print("TP to: " .. TelporterLocation[1])
-                      game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]-.5},TelporterLocation[4])
+                      game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]+.5},TelporterLocation[4])
                     else
                       game.players[event.element.player_index].print("TP to: " .. TelporterLocation[1])
-                      game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]-.5},"nauvis")
+                      game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]+.5},"nauvis")
                     end
                   end
                 end
@@ -312,9 +298,7 @@ script.on_event(defines.events.on_gui_click, function(event)
           getTelaporter(player , TelaportIndex)[1] = newName
           getTelaporter(player , TelaportIndex)[5].backer_name = newName
           player.gui.center.TelaportRenameWindow.destroy()
-          if global.guiTelSetting.visiable == true then 
-            creatTelportWindow(player)
-          end
+          recreateOpenWindows()
         end
       end
     end
@@ -329,9 +313,7 @@ script.on_event(defines.events.on_gui_click, function(event)
       telaportLocations[tpIndex][6][1].position = tpIndex - 1
       telaportLocations[tpIndex - 1][6][1].position = tpIndex
       --reopen window
-      global.guiTelSetting.visiable = false;
-      global.guiTelSetting.window.destroy()
-      creatTelportWindow(player)
+      recreateOpenWindows()
   
   elseif endsWith(event.element.name,"_MoveDown") then
     local data = split(event.element.name,"_")
@@ -347,9 +329,7 @@ script.on_event(defines.events.on_gui_click, function(event)
     telaportLocations[tpIndex][6][1].position = tpIndex + 1
     telaportLocations[tpIndex + 1][6][1].position = tpIndex
     --reopen window
-    global.guiTelSetting.visiable = false;
-    global.guiTelSetting.window.destroy()
-    creatTelportWindow(player)
+    recreateOpenWindows()
   
   elseif endsWith(event.element.name,"_teleportCategory") then 
     local data = split(event.element.name,"_")
@@ -395,7 +375,7 @@ script.on_event(defines.events.on_gui_click, function(event)
       end
       setPlayerCategory(player,newName)
       player.gui.center.TelaportCategorySettingWindow.destroy()
-      creatTelportWindow(player)
+      recreateOpenWindows()
     else
       --alert that player can not input black string as category name
       game.players[event.element.player_index].print("can't have a blank category name.")
@@ -433,13 +413,7 @@ script.on_event(defines.events.on_gui_click, function(event)
     callapseCategory(currentCategory)
     player.gui.center.TelaportSetCategoryWindow.destroy()
     
-    if global.guiTelSetting.visiable == true then 
-      local playerNum1 = 1
-      while game.players[playerNum1] do
-        creatTelportWindow(game.players[playerNum1])
-        playerNum1 = playerNum1 +1
-      end
-    end
+    recreateOpenWindows()
     
   elseif endsWith( event.element.name ,"teleportCategoryAdd") then
     if player.gui.center.TelaportCategoryAddWindow == nil then
@@ -455,14 +429,8 @@ script.on_event(defines.events.on_gui_click, function(event)
     local categoryName = player.gui.center.TelaportCategoryAddWindow.TelaportCategoryAddText.text
     if categoryName ~= nil and categoryName ~= '' then
       if not categoryNameAllreadyExist(categoryName,player) then
-        addCategory(categoryName)
-        if global.guiTelSetting.visiable == true then 
-          local playerNum1 = 1
-          while game.players[playerNum1] do
-            creatTelportWindow(game.players[playerNum1])
-            playerNum1 = playerNum1 +1
-          end
-        end
+        addCategory(categoryName) 
+        recreateOpenWindows()
         player.gui.center.TelaportCategoryAddWindow.destroy()
       end
     else 
@@ -570,22 +538,7 @@ function builtTelaporterBeacon(event)
      --game.players[1].print("here 3")
      --createTeleportButton(playerLoop1)
   --end
-  if global.guiTelSetting.visiable == true then 
-
-     local playerNum1 = 1
-
-     while game.players[playerNum1] do
-        creatTelportWindow(game.players[playerNum1])
-        playerNum1 = playerNum1 +1
-     end
-
-
-
-     --for playerNum2,playerLoop2 in ipairs(game.players) do
-     --game.players[1].print("here 6")
-     --   creatTelportWindow(playerLoop2)
-     --end
-  end
+  recreateOpenWindows()
 end
 
 script.on_event(defines.events.on_robot_built_entity, function(event)
@@ -645,13 +598,7 @@ function removeTelFromList(localTelIndex)
   global.TelaportLocations[localTelIndex][5].destroy()
 	table.remove(global.TelaportLocations,localTelIndex)
   callapseAllCategorys()
-	if global.guiTelSetting.visiable == true then 
-		local playerNum1 = 1
-		while game.players[playerNum1] do
-			creatTelportWindow(game.players[playerNum1])
-			playerNum1 = playerNum1 +1
-		end
-	end
+  recreateOpenWindows()
 end
 
 
@@ -808,5 +755,15 @@ function categoryNameAllreadyExist(newCategoryName,player)
       end
     end
     return false
+end
+
+function recreateOpenWindows()
+  local playerNum1 = 1
+  while game.players[playerNum1] do
+    if game.players[playerNum1].gui.left.personlaTeleportWindow ~= nil then
+      creatTelportWindow(game.players[playerNum1])
+      playerNum1 = playerNum1 +1
+    end
+  end
 end
 
