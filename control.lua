@@ -706,7 +706,11 @@ function setPlayerCategory( player , category )
 end
 
 function getPlayerPage( player )
-  if global.players[player.name].page == nil then 
+  if global.players[player.name] == nil then 
+    global.players[player.name] = {}
+    setPlayerCategory(player , global.Categories[1].name)
+    setPlayerPage( player , 1 )
+  elseif global.players[player.name].page == nil then 
     setPlayerPage( player , 1 )
   end
   return global.players[player.name].page
