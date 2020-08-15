@@ -6,11 +6,11 @@ require("util")
 
 personalTeleporterButtonNamePrefix = "personalTeleporter"
 --button name should go as follows 
---personalTeleporter_ButtonName/discription_numberIfNeeded
-function createButtonName(ButtonNameDiscription,number)
+--personalTeleporter_"ButtonName/discription"_"additionalIdentifier"
+function createButtonName(ButtonNameDiscription,additionalIdentifier)
   local buttonName = personalTeleporterButtonNamePrefix .. "_" .. ButtonNameDiscription
-  if number then 
-    buttonName = buttonName .. "_" .. number
+  if additionalIdentifier then 
+    buttonName = buttonName .. "_" .. additionalIdentifier
   end
   return buttonName
 end
@@ -18,8 +18,8 @@ end
 function createTeleportButton(player)
   if player ~= nil then
     local topGui = player.gui.top
-    if not topGui.PersonalTeleportTool  then
-      topGui.add({type="button", name="PersonalTeleportTool", caption = "Teleport", style="blueprint_button_style"})
+    if not topGui.personalTeleporter_PersonalTeleportTool  then
+      topGui.add({type="button", name=createButtonName("PersonalTeleportTool"), caption = "Teleport", style="blueprint_button_style"})
     end
   end
 end
@@ -103,13 +103,28 @@ function initializeVaiables()
       setPlayerCategory(player , global.Categories[1].name)
       setPlayerPage( player , 1 )
       playerNum1 = playerNum1 +1
+      
+      local topGui = player.gui.top
+      if not topGui.PersonalTeleportTool  then
+        topGui.PersonalTeleportTool.destroy()
+        createTeleportButton(player)
+      end
     end
     remakeWindow = true
   end
   
-  if remakeWindow then
-    recreateOpenWindows()
+  local playerNum1 = 1
+  while game.players[playerNum1] do
+    player = game.players[playerNum1]
+    local topGui = player.gui.top
+    if topGui.PersonalTeleportTool  then
+      topGui.PersonalTeleportTool.destroy()
+      createTeleportButton(player)
+    end
+    
+    playerNum1 = playerNum1 +1
   end
+  recreateOpenWindows()
 end
 
 
@@ -155,20 +170,20 @@ function creatTelportWindow(Parplayer)
     playerPage = Count
     setPlayerPage( player , playerPage )
   end
-  buttonFlow.add({type="button", name="teleportPageBack", caption="<", style="blueprint_button_style"})
+  buttonFlow.add({type="button", name=createButtonName("teleportPageBack"), caption="<", style="blueprint_button_style"})
   buttonFlow.add({type="label", name="TelaportInfoPages", caption=playerPage.."/"..Count, style="blueprint_label_style"})
-  buttonFlow.add({type="button", name="teleportPageForward", caption=">", style="blueprint_button_style"})
+  buttonFlow.add({type="button", name=createButtonName("teleportPageForward"), caption=">", style="blueprint_button_style"})
   
   for i,category in ipairs(global.Categories) do
     if category.name == playersCurrentCategory then 
-      buttonFlow.add({type="button", name=category.name.."_teleportCategory", caption=category.name, style="blueprint_button_style_bold"})
+      buttonFlow.add({type="button", name=createButtonName("teleportCategory",category.name), caption=category.name, style="blueprint_button_style_bold"})
     else
-      buttonFlow.add({type="button", name=category.name.."_teleportCategory", caption=category.name, style="blueprint_button_style"})
+      buttonFlow.add({type="button", name=createButtonName("teleportCategory",category.name), caption=category.name, style="blueprint_button_style"})
     end
   end
   
   if tableSize(global.Categories) < 5 then 
-    buttonFlow.add({type="button", name="teleportCategoryAdd", caption="+", style="blueprint_button_style"})
+    buttonFlow.add({type="button", name=createButtonName("teleportCategoryAdd"), caption="+", style="blueprint_button_style"})
   end
   
   displayed = 0
@@ -184,23 +199,29 @@ function creatTelportWindow(Parplayer)
 end
 
 script.on_event(defines.events.on_gui_click, function(event)
+  if beginsWith(event.element.name,personalTeleporterButtonNamePrefix) == false then
+    return
+  end
+  
+  local elementName = string.sub(event.element.name,string.len(personalTeleporterButtonNamePrefix)+2)
+ 
   local refreshWindow = false
   local refreshWindows = false
   local player = game.players[event.element.player_index]
   local playerPage = getPlayerPage(player)
   local playerCategory = getPlayerCategory(player)
   
-  if event.element.name == "PersonalTeleportTool" and player.gui.left.personlaTeleportWindow == nil then
+  if elementName == "PersonalTeleportTool" and player.gui.left.personlaTeleportWindow == nil then
     creatTelportWindow(player)
   
-  elseif event.element.name == "PersonalTeleportTool" and player.gui.left.personlaTeleportWindow ~= nil then
+  elseif elementName == "PersonalTeleportTool" and player.gui.left.personlaTeleportWindow ~= nil then
     --close window
     local gui = player.gui.left
     if gui.personlaTeleportWindow ~= nil then
       gui.personlaTeleportWindow.destroy()
     end
   
-  elseif endsWith(event.element.name, "_TelaportTo") then
+  elseif beginsWith(elementName, "TelaportTo") then
      local noPT = true
      local PTHasEnergy = false
      local TBHasEnergy = false
@@ -212,8 +233,8 @@ script.on_event(defines.events.on_gui_click, function(event)
             noPT = false
             if equip.energy > personalTeleporter.config.energyCostToTeleportEquipment then
               PTHasEnergy = true
-              local data = split(event.element.name,"_")
-              local telaportLocIndex = tonumber(data[1])
+              local data = split(elementName,"_")
+              local telaportLocIndex = tonumber(data[2])
               local TelporterLocation = getTelaporter(player , telaportLocIndex)
               if TelporterLocation == nil then
                 return
@@ -231,18 +252,18 @@ script.on_event(defines.events.on_gui_click, function(event)
                     entity.energy = entity.energy - personalTeleporter.config.energyCostToTeleportBeacon
                     equip.energy = equip.energy - personalTeleporter.config.energyCostToTeleportEquipment
                     if TelporterLocation[4] ~= nil then
-                      game.players[event.element.player_index].print("TP to: " .. TelporterLocation[1])
-                      game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]+.5},TelporterLocation[4])
+                      player.print("TP to: " .. TelporterLocation[1])
+                      player.teleport({TelporterLocation[2],TelporterLocation[3]+.5},TelporterLocation[4])
                     else
-                      game.players[event.element.player_index].print("TP to: " .. TelporterLocation[1])
-                      game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]+.5},"nauvis")
+                      player.print("TP to: " .. TelporterLocation[1])
+                      player.teleport({TelporterLocation[2],TelporterLocation[3]+.5},"nauvis")
                     end
                   end
                 end
               end
               --equip.energy = equip.energy - 2000000
-              --local data = split(event.element.name,"_")
-              --local telaportLocIndex = tonumber(data[1])
+              --local data = split(elementName,"_")
+              --local telaportLocIndex = tonumber(data[2])
               --game.players[event.element.player_index].teleport({TelporterLocation[2],TelporterLocation[3]})
             end
           end
@@ -257,26 +278,26 @@ script.on_event(defines.events.on_gui_click, function(event)
          player.print("The Teleporter Beacon at your requested destination does not have enough energy, it needs " .. personalTeleporter.config.energyCostToTeleportBeacon/1000000 .. "MJ")
       end
     
-  elseif endsWith(event.element.name, "_TelaportRename") then
+  elseif beginsWith(elementName, "TelaportRename_") then
     if player.gui.center.TelaportRenameWindow ~= nill then
       return
     end
-    local data = split(event.element.name,"_")
-    local telaportLocIndex = tonumber(data[1])
+    local data = split(elementName,"_")
+    local telaportLocIndex = tonumber(data[2])
     createTelaPortRenameWindow(player.gui.center,telaportLocIndex,getTelaporter(player , telaportLocIndex)[1])
    
-  elseif event.element.name == "TelaportRenameCancel" then
+  elseif elementName == "TelaportRenameCancel" then
     if player.gui.center.TelaportRenameWindow ~= nill then
       player.gui.center.TelaportRenameWindow.destroy()
     end
    
-   elseif event.element.name == "teleportPageBack" then
+   elseif elementName == "teleportPageBack" then
       if playerPage > 1 then
          setPlayerPage(player, playerPage -1 )
          creatTelportWindow(player)
       end
          
-   elseif event.element.name == "teleportPageForward" then
+   elseif elementName == "teleportPageForward" then
     local Count = 0
     for Index, Value in pairs( getTelaportLocations( playerCategory ) ) do
       Count = Count + 1
@@ -286,9 +307,9 @@ script.on_event(defines.events.on_gui_click, function(event)
          creatTelportWindow(player)
       end
    
- elseif endsWith(event.element.name,"_TelaportRenameOK") then
-    local data = split(event.element.name,"_")
-    local TelaportIndex = data[1]
+ elseif beginsWith(elementName, "TelaportRenameOK") then
+    local data = split(elementName,"_")
+    local TelaportIndex = data[2]
     if player.gui.center.TelaportRenameWindow ~= nill and TelaportIndex ~= nil then
       TelaportIndex = tonumber(TelaportIndex)
       local newName = player.gui.center.TelaportRenameWindow.TelaportRenameText.text
@@ -303,9 +324,9 @@ script.on_event(defines.events.on_gui_click, function(event)
       end
     end
   
-   elseif endsWith(event.element.name,"_MoveUp") then
-      local data = split(event.element.name,"_")
-      local tpIndex = data[1]
+   elseif beginsWith(elementName, "MoveUp") then
+      local data = split(elementName,"_")
+      local tpIndex = data[2]
       if tpIndex == nil    then return end
       tpIndex = tonumber(tpIndex)
       if tpIndex < 2       then return end
@@ -315,9 +336,9 @@ script.on_event(defines.events.on_gui_click, function(event)
       --reopen window
       recreateOpenWindows()
   
-  elseif endsWith(event.element.name,"_MoveDown") then
-    local data = split(event.element.name,"_")
-    local tpIndex = data[1]
+  elseif beginsWith(elementName, "MoveDown") then
+    local data = split(elementName,"_")
+    local tpIndex = data[2]
     if tpIndex == nil then
       return
     end
@@ -331,9 +352,9 @@ script.on_event(defines.events.on_gui_click, function(event)
     --reopen window
     recreateOpenWindows()
   
-  elseif endsWith(event.element.name,"_teleportCategory") then 
-    local data = split(event.element.name,"_")
-    local categoryName = data[1]
+  elseif beginsWith(elementName, "teleportCategory_") then 
+    local data = split(elementName,"_")
+    local categoryName = data[2]
     if categoryName == getPlayerCategory(player) and (player.gui.center.TelaportCategorySettingWindow == nill)then 
       createCategorySettingWindow(player.gui.center,categoryName)
       return
@@ -343,14 +364,14 @@ script.on_event(defines.events.on_gui_click, function(event)
       creatTelportWindow(player)
     end
   
-  elseif endsWith(event.element.name , "TelaportCategorySettingCancel") then 
+  elseif elementName == "TelaportCategorySettingCancel" then 
     if player.gui.center.TelaportCategorySettingWindow ~= nill then
       player.gui.center.TelaportCategorySettingWindow.destroy()
     end
     
-  elseif endsWith(event.element.name , "TelaportCategorySettingOK") then
-    local data = split(event.element.name,"_")
-    local CategoryCurrentName = data[1]
+  elseif beginsWith(elementName, "TelaportCategorySettingOK") then
+    local data = split(elementName,"_")
+    local CategoryCurrentName = data[2]
     local newName = player.gui.center.TelaportCategorySettingWindow.TelaportCategorySettingText.text
     newName = cleanupName(newName)
     if newName ~= nil and newName ~= '' then
@@ -378,25 +399,25 @@ script.on_event(defines.events.on_gui_click, function(event)
       recreateOpenWindows()
     else
       --alert that player can not input black string as category name
-      game.players[event.element.player_index].print("can't have a blank category name.")
+      player.print("can't have a blank category name.")
     end
     
-  elseif endsWith(event.element.name,"_TelaportSetCategory") then 
+  elseif beginsWith(elementName, "TelaportSetCategory_") then 
     if player.gui.center.TelaportSetCategoryWindow == nil then
-      local data = split(event.element.name,"_")
-      local categoryPosition = data[1] 
+      local data = split(elementName,"_")
+      local categoryPosition = data[2] 
       createTelaportSetCategoryWindow(player.gui.center ,categoryPosition, getPlayerCategory(player))
     end
     
-  elseif endsWith(event.element.name , "TelaportSetCategoryCancel") then 
+  elseif elementName == "TelaportSetCategoryCancel" then 
     if player.gui.center.TelaportSetCategoryWindow ~= nil then
       player.gui.center.TelaportSetCategoryWindow.destroy()
     end
     
-  elseif endsWith(event.element.name , "_TelaportSetCategoryOK") then 
-    local data = split(event.element.name,"_")
-    local categoryPosition = tonumber(data[1])
-    local newCategoryName = data[2]
+  elseif beginsWith(elementName, "TelaportSetCategoryOK") then 
+    local data = split(elementName,"_")
+    local categoryPosition = tonumber(data[2])
+    local newCategoryName = data[3]
     local currentCategory = getPlayerCategory(player)
     local done = false
     for i,telaportLoc in ipairs(global.TelaportLocations) do 
@@ -415,17 +436,17 @@ script.on_event(defines.events.on_gui_click, function(event)
     
     recreateOpenWindows()
     
-  elseif endsWith( event.element.name ,"teleportCategoryAdd") then
+  elseif elementName == "teleportCategoryAdd" then
     if player.gui.center.TelaportCategoryAddWindow == nil then
       createTelaportCategoryAddWindow(player.gui.center)
     end
   
-  elseif endsWith(event.element.name , "TelaportCategoryAddCancel") then 
+  elseif elementName == "TelaportCategoryAddCancel" then 
     if player.gui.center.TelaportCategoryAddWindow ~= nil then
       player.gui.center.TelaportCategoryAddWindow.destroy()
     end
   
-  elseif endsWith(event.element.name , "_TelaportCategoryAddOK") then 
+  elseif elementName == "TelaportCategoryAddOK" then 
     local categoryName = player.gui.center.TelaportCategoryAddWindow.TelaportCategoryAddText.text
     if categoryName ~= nil and categoryName ~= '' then
       if not categoryNameAllreadyExist(categoryName,player) then
@@ -435,19 +456,19 @@ script.on_event(defines.events.on_gui_click, function(event)
       end
     else 
       --alert that player can not input black string as category name
-      game.players[event.element.player_index].print("can't have a blank category name.")
+      player.print("can't have a blank category name.")
     end
     
-  elseif string.find(event.element.name , "TeleporterCategorySettingDelete") ~= nil then
-    local data = split(event.element.name,"_")
-    local CategoryCurrentName = data[3]
+  elseif beginsWith(elementName, "TeleporterCategorySettingDelete") then
+    local data = split(elementName,"_")
+    local CategoryCurrentName = data[2]
     local canDelete = true
     if tableSize(getTelaportLocations(CategoryCurrentName)) > 0 then
       --alert that player can not categories that still have teleporters in it
-      game.players[event.element.player_index].print("can't delete category: " .. CategoryCurrentName .. " because it's not empty.")
+      player.print("can't delete category: " .. CategoryCurrentName .. " because it's not empty.")
       canDelete = false
     elseif tableSize(global.Categories) == 1 then
-      game.players[event.element.player_index].print("can't delete category: " .. CategoryCurrentName .. " because it is the only category.")
+      player.print("can't delete category: " .. CategoryCurrentName .. " because it is the only category.")
     else
       for i,catagory in pairs(global.Categories) do 
         if catagory.name == CategoryCurrentName then
@@ -474,8 +495,8 @@ end
     frame.TelaportRenameText.text = oldName
 
     local flow = frame.add({type="flow", name="TelaportRenameFlow", direction="horizontal"})
-    flow.add({type="button", name="TelaportRenameCancel", caption="Cancel"})
-    flow.add({type="button", name=TelportIndex .. "_TelaportRenameOK" , caption="OK"})
+    flow.add({type="button", name=createButtonName("TelaportRenameCancel"), caption="Cancel"})
+    flow.add({type="button", name=createButtonName("TelaportRenameOK",TelportIndex) , caption="OK"})
 
     return frame
   
@@ -488,22 +509,22 @@ function  createTelaPortLocationFrame(Telaport,index,gui,numberOfTelaporters)
     local buttonFlow = frame.add({type="flow", name=index .. "_InfoButtonFlow", direction="horizontal", style="blueprint_button_flow"})
   --  buttonFlow.add({type="button", name=index .. "_blueprintInfoDelete", caption={"btn-blueprint-delete"}, style="blueprint_button_style"})
   --  buttonFlow.add({type="button", name=index .. "_blueprintInfoLoad", caption={"btn-blueprint-load"}, style="blueprint_button_style"})
-    buttonFlow.add({type="button", name=index .. "_TelaportTo", caption="T", style="blueprint_button_style"})
-    buttonFlow.add({type="button", name=index .. "_TelaportRename", caption="N", style="blueprint_button_style"})
-    buttonFlow.add({type="button", name=index .. "_TelaportSetCategory", caption="C", style="blueprint_button_style"})
+    buttonFlow.add({type="button", name=createButtonName("TelaportTo",index) , caption="T", style="blueprint_button_style"})
+    buttonFlow.add({type="button", name=createButtonName("TelaportRename",index) , caption="N", style="blueprint_button_style"})
+    buttonFlow.add({type="button", name=createButtonName("TelaportSetCategory",index) , caption="C", style="blueprint_button_style"})
     local suffix
     if index > 1 then
       suffix = " "
     else
       suffix = "|"
     end
-    buttonFlow.add({type="button", name=index .. "_MoveUp", caption=suffix .. "<", style="blueprint_button_style"})
+    buttonFlow.add({type="button", name=createButtonName("MoveUp",index), caption=suffix .. "<", style="blueprint_button_style"})
     if index < numberOfTelaporters then
       suffix = " "
     else
       suffix = "|"
     end
-    buttonFlow.add({type="button", name=index .. "_MoveDown", caption=">" .. suffix, style="blueprint_button_style"})
+    buttonFlow.add({type="button", name=createButtonName("MoveDown",index) , caption=">" .. suffix, style="blueprint_button_style"})
     local label = frame.add({type="label", name=index .. "_TelaportInfoName", caption=Telaport[1], style="blueprint_label_style"})
    
 end
@@ -607,6 +628,10 @@ function endsWith(String,End)
   return End=='' or string.sub(String,-string.len(End))==End
 end
 
+function beginsWith(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
+end
+
 function split(stringA, sep)
   local sep, fields = sep or ":", {}
   local pattern = string.format("([^%s]+)", sep)
@@ -640,9 +665,9 @@ function createCategorySettingWindow(gui,oldName)
   frame.TelaportCategorySettingText.text = oldName
 
   local flow = frame.add({type="flow", name="TelaportCategorySettingFlow", direction="horizontal"})
-  flow.add({type="button", name="TelaportCategorySettingCancel", caption="Cancel"})
+  flow.add({type="button", name=createButtonName("TelaportCategorySettingCancel"), caption="Cancel"})
   flow.add({type="button", name=createButtonName("TeleporterCategorySettingDelete",oldName), caption="Delete"})
-  flow.add({type="button", name=oldName .. "_TelaportCategorySettingOK" , caption="OK"})
+  flow.add({type="button", name=createButtonName("TelaportCategorySettingOK",oldName) , caption="OK"})
 
   return frame
 end
@@ -665,12 +690,12 @@ function createTelaportSetCategoryWindow(gui,categoryPosition, currentCategory)
   local frame = gui.add({type="frame", name="TelaportSetCategoryWindow", direction="vertical", caption="Move Telaporter to:"})
   for i,category in ipairs(global.Categories) do 
     if category.name ~= currentCategory then 
-      frame.add({type="button", name=categoryPosition.."_"..category.name.."_TelaportSetCategoryOK", caption=category.name})
+      frame.add({type="button", name=createButtonName("TelaportSetCategoryOK",categoryPosition.."_"..category.name), caption=category.name})
     end
   end
 
   local flow = frame.add({type="flow", name="TelaportSetCategoryFlow", direction="horizontal"})
-  flow.add({type="button", name="TelaportSetCategoryCancel", caption="Cancel"})
+  flow.add({type="button", name=createButtonName("TelaportSetCategoryCancel"), caption="Cancel"})
 
   return frame
 end
@@ -681,43 +706,35 @@ function createTelaportCategoryAddWindow( gui )
   frame.TelaportCategoryAddText.text = ""
 
   local flow = frame.add({type="flow", name="TelaportCategoryAddFlow", direction="horizontal"})
-  flow.add({type="button", name="TelaportCategoryAddCancel", caption="Cancel"})
-  flow.add({type="button", name="_TelaportCategoryAddOK" , caption="OK"})
+  flow.add({type="button", name=createButtonName("TelaportCategoryAddCancel"), caption="Cancel"})
+  flow.add({type="button", name=createButtonName("TelaportCategoryAddOK") , caption="OK"})
 
   return frame
 end
 
 function getPlayerCategory( player )
-  local test = global
-  test = test.players
-  test = test[player.name]
-  if global.players[player.name] == nil then global.players[player.name] = {} end
-  if global.players[player.name].category == nil then 
+  if getGlobalPlayer( player ).category == nil then 
     setPlayerCategory( player , global.Categories[1].name )
   end
-  return global.players[player.name].category
+  return getGlobalPlayer( player ).category
 end
 
 function setPlayerCategory( player , category )
-  if global.players[player.name].category == nil or global.players[player.name].category ~= category then
-    global.players[player.name].category = category
+  if getGlobalPlayer( player ).category == nil or getGlobalPlayer( player ).category ~= category then
+    getGlobalPlayer( player ).category = category
     setPlayerPage( player , 1 )
   end
 end
 
 function getPlayerPage( player )
-  if global.players[player.name] == nil then 
-    global.players[player.name] = {}
-    setPlayerCategory(player , global.Categories[1].name)
-    setPlayerPage( player , 1 )
-  elseif global.players[player.name].page == nil then 
+  if getGlobalPlayer( player ).page == nil then 
     setPlayerPage( player , 1 )
   end
-  return global.players[player.name].page
+  return getGlobalPlayer( player ).page
 end
 
 function setPlayerPage( player , page )
-  global.players[player.name].page = page
+  getGlobalPlayer( player ).page = page
 end
 
 function addCategory(categoryName)
@@ -750,6 +767,8 @@ function callapseAllCategorys()
   end
 end
 
+-- check to see if category name is already in use and if it is print error message
+-- return true if category name is already in use else return false 
 function categoryNameAllreadyExist(newCategoryName,player)
   newName = newCategoryName
     for i,category in ipairs(global.Categories) do
@@ -761,6 +780,7 @@ function categoryNameAllreadyExist(newCategoryName,player)
     return false
 end
 
+--use when you are changing something in the telaporter window to recreate any open winodws
 function recreateOpenWindows()
   local playerNum1 = 1
   while game.players[playerNum1] do
@@ -771,3 +791,14 @@ function recreateOpenWindows()
   end
 end
 
+-- get the player from the global varible 
+-- allowed to access global to get players
+-- should be the only access point to global.players
+function getGlobalPlayer( player )
+  if global.players[player.name] == nil then 
+    global.players[player.name] = {}
+    setPlayerCategory(player , global.Categories[1].name)
+    setPlayerPage( player , 1 )
+  end
+  return  global.players[player.name]
+end
