@@ -103,12 +103,6 @@ function initializeVaiables()
       setPlayerCategory(player , global.Categories[1].name)
       setPlayerPage( player , 1 )
       playerNum1 = playerNum1 +1
-      
-      local topGui = player.gui.top
-      if not topGui.PersonalTeleportTool  then
-        topGui.PersonalTeleportTool.destroy()
-        createTeleportButton(player)
-      end
     end
     remakeWindow = true
   end
