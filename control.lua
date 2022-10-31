@@ -27,6 +27,7 @@ end
 script.on_init(function()
    initializeVaiables()
 end)
+
 script.on_configuration_changed(function()
    initializeVaiables()
 end)
@@ -196,8 +197,10 @@ script.on_event(defines.events.on_gui_click, function(event)
   if beginsWith(event.element.name,personalTeleporterButtonNamePrefix) == false then
     return
   end
-  local elementName = string.sub(event.element.name,string.len(personalTeleporterButtonNamePrefix)+2)
   local player = game.players[event.element.player_index]
+  
+  local elementName = string.sub(event.element.name,string.len(personalTeleporterButtonNamePrefix)+2)
+  player = game.players[event.element.player_index]
   local playerWindowOpenNamePrefix = getPlayerWindowOpenNamePrefix(player)
   
   if playerWindowOpenNamePrefix ~= false and beginsWith(elementName,playerWindowOpenNamePrefix) == false then
@@ -221,6 +224,13 @@ script.on_event(defines.events.on_gui_click, function(event)
     end
   
   elseif beginsWith(elementName, "TelaportTo") then
+      local hasCharter = true
+      
+      if player.character == nil then
+        hasCharter = false
+        player.print("Can not teleport when you are in god mode.")
+        return
+      end
      local noPT = true
      local PTHasEnergy = false
      local TBHasEnergy = false
@@ -497,12 +507,12 @@ script.on_event(defines.events.on_gui_click, function(event)
 end)
   
   
-  function cleanupName(name)
+function cleanupName(name)
   return string.gsub(name, "_[\\.?~!@#$%^&*(){}\"']", "")
 end
 
 
-  function createTelaPortRenameWindow(gui,TelportIndex,oldName)
+function createTelaPortRenameWindow(gui,TelportIndex,oldName)
    local frame = gui.add({type="frame", name="TelaportRenameWindow", direction="vertical", caption="Teleport Location Rename"})
     frame.add({type="textfield", name="TelaportRenameText"})
     frame.TelaportRenameText.text = oldName
