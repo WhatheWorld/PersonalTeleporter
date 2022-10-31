@@ -57,7 +57,7 @@ data:extend({
 			{"Teleporter_Beacon", 1},
 			{"rocket-control-unit", 10},
 			{"low-density-structure",10},
-			{"fusion-reactor-equipment", 5}
+			{"fusion-reactor-equipment", 2}
 		},
 		result = "Personal-Teleporter",
 	
