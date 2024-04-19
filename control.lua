@@ -612,6 +612,61 @@ script.on_event(defines.events.on_entity_died, function(event)
   end
 end)
 
+script.on_event(defines.events.on_entity_cloned, function(event)
+  if string.find(event.source.name ,"Teleporter_Beacon") then
+    onTeleporterCloned(event)
+  end
+  if string.find(event.source.name ,"TP_marker") then
+    onTPMarkerCloned(event)
+  end
+end)
+
+function onTPMarkerCloned(event)
+  local sourceEntity = event.source
+  local destinationEntity = event.destination
+  
+  for i,telaportLoc in ipairs(global.TelaportLocations) do
+    if (i > 0) then
+      if (sourceEntity.surface.name == telaportLoc[4]) then
+        if (sourceEntity.position.x == telaportLoc[2] and sourceEntity.position.y == telaportLoc[3]) then
+          --found source teleporter 
+          telaportLoc[5] = destinationEntity
+          return
+          
+        end
+      end
+      if (destinationEntity.surface.name == telaportLoc[4]) then
+        if (destinationEntity.position.x == telaportLoc[2] and destinationEntity.position.y == telaportLoc[3]) then
+          --found destination teleporter 
+          telaportLoc[5] = destinationEntity
+          return
+          
+        end
+      end
+    end
+  end
+  
+end
+
+function onTeleporterCloned(event)
+  local sourceEntity = event.source
+  local destinationEntity = event.destination
+  
+  for i,telaportLoc in ipairs(global.TelaportLocations) do
+    if (i > 0) then
+      if (sourceEntity.surface.name == telaportLoc[4]) then
+        if (sourceEntity.position.x == telaportLoc[2] and sourceEntity.position.y == telaportLoc[3]) then
+          --found source teleporter 
+          telaportLoc[4] = destinationEntity.surface.name
+          telaportLoc[2] = destinationEntity.position.x
+          telaportLoc[3] = destinationEntity.position.y          
+        end
+      end
+    end
+  end
+  
+end
+
 function updateTelporterList()
    for i,telaportLoc in ipairs(global.TelaportLocations) do
     if (i > 0) then
@@ -835,4 +890,8 @@ function getGlobalPlayer( player )
     setPlayerPage( player , 1 )
   end
   return  global.players[player.name]
+end
+
+function printMessage(errorLevel , message)
+  game.print(message)
 end
