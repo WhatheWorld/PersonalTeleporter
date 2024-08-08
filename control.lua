@@ -446,6 +446,7 @@ function createTelaPortRenameWindow(player,TelportIndex,oldName)
   local frame = gui.add({type="frame", name="TelaportRenameWindow", direction="vertical", caption="Teleport Location Rename", tags={teleportIndex=TelportIndex}})
   frame.add({type="textfield", name="TelaportRenameText"})
   frame.TelaportRenameText.text = oldName
+  frame.TelaportRenameText.focus()
   
   local flow = frame.add({type="flow", name="TelaportRenameFlow", direction="horizontal"})
   flow.add({type="button", name=createButtonName("TelaportRename_Cancel"), caption="Cancel"})
@@ -732,6 +733,7 @@ function createCategorySettingWindow(player,oldName)
   local frame = gui.add({type="frame", name="TelaportCategorySettingWindow", direction="vertical", caption="Category Settings", tags={oldName=oldName}})
   frame.add({type="textfield", name="TelaportCategorySettingText"})
   frame.TelaportCategorySettingText.text = oldName
+  frame.TelaportCategorySettingText.focus()
 
   local flow = frame.add({type="flow", name="TelaportCategorySettingFlow", direction="horizontal"})
   flow.add({type="button", name=createButtonName("TelaportCategorySetting_Cancel"), caption="Cancel"})
@@ -824,6 +826,7 @@ function createTelaportCategoryAddWindow(player)
   local frame = gui.add({type="frame", name="TelaportCategoryAddWindow", direction="vertical", caption="New Category Name"})
   frame.add({type="textfield", name="TelaportCategoryAddText"})
   frame.TelaportCategoryAddText.text = ""
+  frame.TelaportCategoryAddText.focus()
 
   local flow = frame.add({type="flow", name="TelaportCategoryAddFlow", direction="horizontal"})
   flow.add({type="button", name=createButtonName("TelaportCategoryAdd_Cancel"), caption="Cancel"})
