@@ -293,14 +293,10 @@ script.on_event(defines.events.on_gui_click, function(event)
     end
     local data = split(elementName,"_")
     local telaportLocIndex = tonumber(data[2])
-    setPlayerWindowOpenNamePrefix(player,"TelaportRename")
-    createTelaPortRenameWindow(player.gui.center,telaportLocIndex,getTelaporter(player , telaportLocIndex)[1])
+    createTelaPortRenameWindow(player,telaportLocIndex,getTelaporter(player , telaportLocIndex)[1])
    
   elseif elementName == "TelaportRename_Cancel" then
-    if player.gui.center.TelaportRenameWindow ~= nill then
-      player.gui.center.TelaportRenameWindow.destroy()
-      setPlayerWindowOpenNamePrefix(player,nil)
-    end
+    closeTelaPortRenameWindow(player)
    
   elseif elementName == "teleportPageBack" then
       if playerPage > 1 then
@@ -319,22 +315,7 @@ script.on_event(defines.events.on_gui_click, function(event)
       end
    
   elseif beginsWith(elementName, "TelaportRename_OK") then
-    local data = split(elementName,"_")
-    local TelaportIndex = data[3]
-    if player.gui.center.TelaportRenameWindow ~= nill and TelaportIndex ~= nil then
-      TelaportIndex = tonumber(TelaportIndex)
-      local newName = player.gui.center.TelaportRenameWindow.TelaportRenameText.text
-      if newName ~= nil then
-        newName = cleanupName(newName)
-        if newName ~= ""  then
-          getTelaporter(player , TelaportIndex)[1] = newName
-          getTelaporter(player , TelaportIndex)[5].backer_name = newName
-          player.gui.center.TelaportRenameWindow.destroy()
-          setPlayerWindowOpenNamePrefix(player,nil)
-          recreateOpenWindows()
-        end
-      end
-    end
+    onRenameConfirm(event)
   
   elseif beginsWith(elementName, "MoveUp") then
       local data = split(elementName,"_")
@@ -367,9 +348,8 @@ script.on_event(defines.events.on_gui_click, function(event)
   elseif beginsWith(elementName, "teleportCategory_") then 
     local data = split(elementName,"_")
     local categoryName = data[2]
-    if categoryName == getPlayerCategory(player) and (player.gui.center.TelaportCategorySettingWindow == nill)then 
-      createCategorySettingWindow(player.gui.center,categoryName)
-      setPlayerWindowOpenNamePrefix(player, "TelaportCategorySetting")
+    if categoryName == getPlayerCategory(player) and (player.gui.center.TelaportCategorySettingWindow == nil) then 
+      createCategorySettingWindow(player,categoryName)
       return
     end
     if categoryName ~= getPlayerCategory(player) then
@@ -378,45 +358,10 @@ script.on_event(defines.events.on_gui_click, function(event)
     end
   
   elseif elementName == "TelaportCategorySetting_Cancel" then 
-    if player.gui.center.TelaportCategorySettingWindow ~= nill then
-      player.gui.center.TelaportCategorySettingWindow.destroy()
-      setPlayerWindowOpenNamePrefix(player, nil)
-    end
+    closeCategorySettingsWindow(player)
     
   elseif beginsWith(elementName, "TelaportCategorySetting_OK") then
-    local data = split(elementName,"_")
-    local CategoryCurrentName = data[3]
-    local newName = player.gui.center.TelaportCategorySettingWindow.TelaportCategorySettingText.text
-    newName = cleanupName(newName)
-    if newName ~= nil and newName ~= '' then
-      for i,category in ipairs(global.Categories) do
-        if category.name == newName then 
-          player.gui.center.TelaportCategorySettingWindow.destroy()
-          setPlayerWindowOpenNamePrefix(player, nil)
-          player.print("can't rename Category to a name that already exist")
-          return
-        end
-      end
-      for i,category in ipairs(global.Categories) do 
-        if category.name == CategoryCurrentName then 
-          category.name = newName
-        end
-      end
-      for i,telaportLoc in ipairs(global.TelaportLocations) do 
-        for x,category in ipairs(telaportLoc[6]) do 
-          if category.name == CategoryCurrentName then
-            category.name = newName
-          end
-        end
-      end
-      setPlayerCategory(player,newName)
-      player.gui.center.TelaportCategorySettingWindow.destroy()
-      setPlayerWindowOpenNamePrefix(player, nil)
-      recreateOpenWindows()
-    else
-      --alert that player can not input black string as category name
-      player.print("can't have a blank category name.")
-    end
+    onCategorySettingsConfirm(event)
     
   elseif beginsWith(elementName, "TelaportSetCategoryOpen_") then 
     if player.gui.center.TelaportSetCategoryWindow == nil then
@@ -457,29 +402,14 @@ script.on_event(defines.events.on_gui_click, function(event)
     
   elseif elementName == "teleportCategoryAdd" then
     if player.gui.center.TelaportCategoryAddWindow == nil then
-      createTelaportCategoryAddWindow(player.gui.center)
-      setPlayerWindowOpenNamePrefix(player , "TelaportCategoryAdd")
+      createTelaportCategoryAddWindow(player)
     end
   
-  elseif elementName == "TelaportCategoryAdd_Cancel" then 
-    if player.gui.center.TelaportCategoryAddWindow ~= nil then
-      player.gui.center.TelaportCategoryAddWindow.destroy()
-      setPlayerWindowOpenNamePrefix(player,nil)
-    end
+  elseif elementName == "TelaportCategoryAdd_Cancel" then
+    closeCategoryAddWindow(player)
   
   elseif elementName == "TelaportCategoryAdd_OK" then 
-    local categoryName = player.gui.center.TelaportCategoryAddWindow.TelaportCategoryAddText.text
-    if categoryName ~= nil and categoryName ~= '' then
-      if not categoryNameAllreadyExist(categoryName,player) then
-        addCategory(categoryName) 
-        recreateOpenWindows()
-        player.gui.center.TelaportCategoryAddWindow.destroy()
-        setPlayerWindowOpenNamePrefix(player,nil)
-      end
-    else 
-      --alert that player can not input black string as category name
-      player.print("can't have a blank category name.")
-    end
+    onCategoryAddConfirm(event)
     
   elseif beginsWith(elementName, "TelaportCategorySetting_Delete") then
     local data = split(elementName,"_")
@@ -501,8 +431,7 @@ script.on_event(defines.events.on_gui_click, function(event)
       end
     end
     --setPlayerCategory(player,newName)
-    player.gui.center.TelaportCategorySettingWindow.destroy()
-    setPlayerWindowOpenNamePrefix(player, nil)
+    closeCategorySettingsWindow(player)
   end
 end)
   
@@ -512,19 +441,81 @@ function cleanupName(name)
 end
 
 
-function createTelaPortRenameWindow(gui,TelportIndex,oldName)
-   local frame = gui.add({type="frame", name="TelaportRenameWindow", direction="vertical", caption="Teleport Location Rename"})
-    frame.add({type="textfield", name="TelaportRenameText"})
-    frame.TelaportRenameText.text = oldName
-
-    local flow = frame.add({type="flow", name="TelaportRenameFlow", direction="horizontal"})
-    flow.add({type="button", name=createButtonName("TelaportRename_Cancel"), caption="Cancel"})
-    flow.add({type="button", name=createButtonName("TelaportRename_OK",TelportIndex) , caption="OK"})
-
-    return frame
+function createTelaPortRenameWindow(player,TelportIndex,oldName)
+  local gui = player.gui.center;
+  local frame = gui.add({type="frame", name="TelaportRenameWindow", direction="vertical", caption="Teleport Location Rename", tags={teleportIndex=TelportIndex}})
+  frame.add({type="textfield", name="TelaportRenameText"})
+  frame.TelaportRenameText.text = oldName
+  frame.TelaportRenameText.focus()
   
+  local flow = frame.add({type="flow", name="TelaportRenameFlow", direction="horizontal"})
+  flow.add({type="button", name=createButtonName("TelaportRename_Cancel"), caption="Cancel"})
+  flow.add({type="button", name=createButtonName("TelaportRename_OK",TelportIndex) , caption="OK"})
+  
+  setPlayerWindowOpenNamePrefix(player,"TelaportRename")
+  player.opened = frame;
+  return frame
+end
+
+function closeTelaPortRenameWindow(player)
+  if player.gui.center.TelaportRenameWindow ~= nil then
+    player.gui.center.TelaportRenameWindow.destroy()
+    setPlayerWindowOpenNamePrefix(player,nil)
   end
-  
+  player.opened = nil
+end
+
+script.on_event(defines.events.on_gui_closed, function(event)
+  if not(event.element and event.element.valid) then
+    return
+  end
+
+  local player = game.players[event.player_index]
+
+  if event.element.name == "TelaportRenameWindow" then
+    closeTelaPortRenameWindow(player)
+  elseif event.element.name == "TelaportCategoryAddWindow" then
+    closeCategoryAddWindow(player)
+  elseif event.element.name == "TelaportCategorySettingWindow" then
+    closeCategorySettingsWindow(player)
+  end
+end)
+
+script.on_event(defines.events.on_gui_confirmed, function(event)
+  if not(event.element and event.element.valid and event.element.parent) then
+    return
+  end
+
+  if event.element.parent.name == "TelaportRenameWindow" then
+    onRenameConfirm(event)
+  elseif event.element.parent.name == "TelaportCategoryAddWindow" then
+    onCategoryAddConfirm(event)
+  elseif event.element.parent.name == "TelaportCategorySettingWindow" then
+    onCategorySettingsConfirm(event)
+  end
+end)
+
+function onRenameConfirm(event)
+  local player = game.players[event.player_index]
+  local frame = player.gui.center.TelaportRenameWindow
+  if frame == nil then
+    player.print("Could not find open rename window")
+    return
+  end
+  local TelaportIndex = frame.tags.teleportIndex
+
+  local newName = frame.TelaportRenameText.text
+  if newName ~= nil then
+    newName = cleanupName(newName)
+    if newName ~= ""  then
+      getTelaporter(player , TelaportIndex)[1] = newName
+      getTelaporter(player , TelaportIndex)[5].backer_name = newName
+      closeTelaPortRenameWindow(player)
+      recreateOpenWindows()
+    end
+  end
+end
+
   --big thanks to Foreman mod
 function  createTelaPortLocationFrame(Telaport,index,gui,numberOfTelaporters)
   
@@ -737,17 +728,69 @@ function getTelaportLocations( Category )
   return locations
 end
 
-function createCategorySettingWindow(gui,oldName)
-  local frame = gui.add({type="frame", name="TelaportCategorySettingWindow", direction="vertical", caption="Category Settings"})
+function createCategorySettingWindow(player,oldName)
+  local gui = player.gui.center;
+  local frame = gui.add({type="frame", name="TelaportCategorySettingWindow", direction="vertical", caption="Category Settings", tags={oldName=oldName}})
   frame.add({type="textfield", name="TelaportCategorySettingText"})
   frame.TelaportCategorySettingText.text = oldName
+  frame.TelaportCategorySettingText.focus()
 
   local flow = frame.add({type="flow", name="TelaportCategorySettingFlow", direction="horizontal"})
   flow.add({type="button", name=createButtonName("TelaportCategorySetting_Cancel"), caption="Cancel"})
   flow.add({type="button", name=createButtonName("TelaportCategorySetting_Delete",oldName), caption="Delete"})
   flow.add({type="button", name=createButtonName("TelaportCategorySetting_OK",oldName) , caption="OK"})
 
+  setPlayerWindowOpenNamePrefix(player, "TelaportCategorySetting")
+  player.opened = frame
   return frame
+end
+
+function closeCategorySettingsWindow(player)
+  player.gui.center.TelaportCategorySettingWindow.destroy()
+  setPlayerWindowOpenNamePrefix(player, nil)
+  player.opened = nil
+end
+
+function onCategorySettingsConfirm(event)
+  local player = game.players[event.player_index]
+  local frame = player.gui.center.TelaportCategorySettingWindow
+  if frame == nil then
+    player.print("Could not find open settings window")
+    return
+  end
+  local CategoryCurrentName = frame.tags.oldName
+
+  local newName = frame.TelaportCategorySettingText.text
+  newName = cleanupName(newName)
+  if not (newName ~= nil and newName ~= '') then
+    --alert that player can not input black string as category name
+    player.print("Category name cannot be blank / empty")
+    return
+  end
+
+  for i,category in ipairs(global.Categories) do
+    if category.name == newName then
+      player.print("Can't rename Category to a name that already exist")
+      return
+    end
+  end
+
+  for i,category in ipairs(global.Categories) do
+    if category.name == CategoryCurrentName then
+      category.name = newName
+    end
+  end
+  for i,telaportLoc in ipairs(global.TelaportLocations) do
+    for x,category in ipairs(telaportLoc[6]) do
+      if category.name == CategoryCurrentName then
+        category.name = newName
+      end
+    end
+  end
+  setPlayerCategory(player,newName)
+  
+  closeCategorySettingsWindow(player)
+  recreateOpenWindows()
 end
 
 function getNextPosition( Category )
@@ -778,16 +821,51 @@ function createTelaportSetCategoryWindow(gui,categoryPosition, currentCategory)
   return frame
 end
 
-function createTelaportCategoryAddWindow( gui )
+function createTelaportCategoryAddWindow(player)
+  local gui = player.gui.center
   local frame = gui.add({type="frame", name="TelaportCategoryAddWindow", direction="vertical", caption="New Category Name"})
   frame.add({type="textfield", name="TelaportCategoryAddText"})
   frame.TelaportCategoryAddText.text = ""
+  frame.TelaportCategoryAddText.focus()
 
   local flow = frame.add({type="flow", name="TelaportCategoryAddFlow", direction="horizontal"})
   flow.add({type="button", name=createButtonName("TelaportCategoryAdd_Cancel"), caption="Cancel"})
   flow.add({type="button", name=createButtonName("TelaportCategoryAdd_OK") , caption="OK"})
 
+  setPlayerWindowOpenNamePrefix(player , "TelaportCategoryAdd")
+  player.opened = frame
   return frame
+end
+
+function closeCategoryAddWindow(player)
+  player.gui.center.TelaportCategoryAddWindow.destroy()
+  setPlayerWindowOpenNamePrefix(player,nil)
+  player.opened = nil
+end
+
+function onCategoryAddConfirm(event)
+  local player = game.players[event.player_index]
+  local frame = player.gui.center.TelaportCategoryAddWindow
+  if frame == nil then
+    player.print("Could not find open window")
+    return
+  end
+
+  local categoryName = frame.TelaportCategoryAddText.text
+  if not(categoryName ~= nil and categoryName ~= '') then
+    --alert that player can not input black string as category name
+    player.print("can't have a blank category name.")
+    return
+  end
+
+  if categoryNameAllreadyExist(categoryName,player) then
+    player.print("A category with the same name already exists")
+    return
+  end
+
+  addCategory(categoryName)
+  recreateOpenWindows()
+  closeCategoryAddWindow(player)
 end
 
 function getPlayerWindowOpenNamePrefix( player )
