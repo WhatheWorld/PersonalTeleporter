@@ -294,13 +294,10 @@ script.on_event(defines.events.on_gui_click, function(event)
     local data = split(elementName,"_")
     local telaportLocIndex = tonumber(data[2])
     setPlayerWindowOpenNamePrefix(player,"TelaportRename")
-    createTelaPortRenameWindow(player.gui.center,telaportLocIndex,getTelaporter(player , telaportLocIndex)[1])
+    createTelaPortRenameWindow(player,telaportLocIndex,getTelaporter(player , telaportLocIndex)[1])
    
   elseif elementName == "TelaportRename_Cancel" then
-    if player.gui.center.TelaportRenameWindow ~= nill then
-      player.gui.center.TelaportRenameWindow.destroy()
-      setPlayerWindowOpenNamePrefix(player,nil)
-    end
+    closeTelaPortRenameWindow(player)
    
   elseif elementName == "teleportPageBack" then
       if playerPage > 1 then
@@ -319,22 +316,7 @@ script.on_event(defines.events.on_gui_click, function(event)
       end
    
   elseif beginsWith(elementName, "TelaportRename_OK") then
-    local data = split(elementName,"_")
-    local TelaportIndex = data[3]
-    if player.gui.center.TelaportRenameWindow ~= nill and TelaportIndex ~= nil then
-      TelaportIndex = tonumber(TelaportIndex)
-      local newName = player.gui.center.TelaportRenameWindow.TelaportRenameText.text
-      if newName ~= nil then
-        newName = cleanupName(newName)
-        if newName ~= ""  then
-          getTelaporter(player , TelaportIndex)[1] = newName
-          getTelaporter(player , TelaportIndex)[5].backer_name = newName
-          player.gui.center.TelaportRenameWindow.destroy()
-          setPlayerWindowOpenNamePrefix(player,nil)
-          recreateOpenWindows()
-        end
-      end
-    end
+    onRenameConfirm(event)
   
   elseif beginsWith(elementName, "MoveUp") then
       local data = split(elementName,"_")
@@ -512,8 +494,9 @@ function cleanupName(name)
 end
 
 
-function createTelaPortRenameWindow(gui,TelportIndex,oldName)
-   local frame = gui.add({type="frame", name="TelaportRenameWindow", direction="vertical", caption="Teleport Location Rename"})
+function createTelaPortRenameWindow(player,TelportIndex,oldName)
+   local gui = player.gui.center;
+   local frame = gui.add({type="frame", name="TelaportRenameWindow", direction="vertical", caption="Teleport Location Rename", tags={teleportIndex=TelportIndex}})
     frame.add({type="textfield", name="TelaportRenameText"})
     frame.TelaportRenameText.text = oldName
 
@@ -521,10 +504,53 @@ function createTelaPortRenameWindow(gui,TelportIndex,oldName)
     flow.add({type="button", name=createButtonName("TelaportRename_Cancel"), caption="Cancel"})
     flow.add({type="button", name=createButtonName("TelaportRename_OK",TelportIndex) , caption="OK"})
 
+    player.opened = frame;
     return frame
   
+end
+
+function closeTelaPortRenameWindow(player)
+  if player.gui.center.TelaportRenameWindow ~= nil then
+    player.gui.center.TelaportRenameWindow.destroy()
+    setPlayerWindowOpenNamePrefix(player,nil)
   end
-  
+  player.opened = nil
+end
+
+script.on_event(defines.events.on_gui_closed, function(event)
+  player = game.players[event.player_index]
+  if event.element and event.element.valid and event.element.name == "TelaportRenameWindow" then
+    closeTelaPortRenameWindow(player)
+  end
+end)
+
+script.on_event(defines.events.on_gui_confirmed, function(event)
+  if event.element and event.element.valid and event.element.parent and event.element.parent.name == "TelaportRenameWindow" then
+    onRenameConfirm(event)
+  end
+end)
+
+function onRenameConfirm(event)
+  local player = game.players[event.player_index]
+  local frame = player.gui.center.TelaportRenameWindow
+  if frame == nil then
+    player.print("Could not find open rename window")
+    return
+  end
+  local TelaportIndex = frame.tags.teleportIndex
+
+  local newName = frame.TelaportRenameText.text
+  if newName ~= nil then
+    newName = cleanupName(newName)
+    if newName ~= ""  then
+      getTelaporter(player , TelaportIndex)[1] = newName
+      getTelaporter(player , TelaportIndex)[5].backer_name = newName
+      closeTelaPortRenameWindow(player)
+      recreateOpenWindows()
+    end
+  end
+end
+
   --big thanks to Foreman mod
 function  createTelaPortLocationFrame(Telaport,index,gui,numberOfTelaporters)
   
