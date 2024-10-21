@@ -5,20 +5,18 @@ data:extend({
 	{
 		type = "recipe",
 		name = "Teleporter_Beacon",
+    enabled = false,
 		ingredients =
 		{
-			{"steel-plate", 100},
-			{"copper-plate", 100},
-			{"advanced-circuit", 100},
-			{"TeleporterCore",1}
+			{type="item",name="steel-plate", amount=100},
+			{type="item",name="copper-plate", amount=100},
+			{type="item",name="processing-unit", amount=100},
+			{type="item",name="TeleporterCore",amount=1}
 		},
-		result = "Teleporter_Beacon",
-		enabled = "false"	
+		--result = "Teleporter_Beacon",
+    results = { {type="item", name="Teleporter_Beacon", amount=1} }
 	},
-	
-	
-	
-    {
+  {
 		type = "recipe",
 		name = "liquid-alien-artifacts",
 		category = "chemistry",
@@ -33,8 +31,8 @@ data:extend({
 			{type="fluid", name="liquid-alien-artifacts", amount=1}
 		},
 		subgroup = "fluid-recipes",
-		enabled = "false"
-    },
+		enabled = false
+  },
 	{
 		type = "recipe",
 		name = "TeleporterCore",
@@ -43,23 +41,27 @@ data:extend({
 		{	
 			{type="fluid", name = "liquid-alien-artifacts", amount = 10}
 		},
-		result = "TeleporterCore",
-		enabled = "false"
+    results=
+		{
+			{type="item", name="TeleporterCore", amount=1}
+		},
+		enabled = false
 	},
-	
 	{
 		type = "recipe",
 		name = "Personal-Teleporter",
-		enabled = "false",
+		enabled = false,
 		energy_required = 10,
 		ingredients = 
 		{
-			{"Teleporter_Beacon", 1},
-			{"rocket-control-unit", 10},
-			{"low-density-structure",10},
-			{"fusion-reactor-equipment", 2}
+			{type="item", name="Teleporter_Beacon", amount=1},
+			{type="item", name="processing-unit", amount=10},
+			{type="item", name="low-density-structure",amount=10},
+			{type="item", name="fission-reactor-equipment", amount=1}
 		},
-		result = "Personal-Teleporter",
-	
+    results=
+		{
+			{type="item", name="Personal-Teleporter", amount=1}
+		}
 	}
 })

@@ -28,7 +28,7 @@ data:extend({
 		},
 		
 	  },
-      prerequisites = {"automation-3","fusion-reactor-equipment","uranium-processing","rocket-control-unit"},
+      prerequisites = {"automation-3","fission-reactor-equipment","uranium-processing"},
       unit =
       {
         count = 2000,

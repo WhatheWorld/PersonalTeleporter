@@ -35,9 +35,9 @@ end)
 script.on_event(defines.events.on_player_created, function(event)
  initializeVaiables()
  local player = game.players[event.player_index]
- global.players[player.name] = {category = "" , page = 1}
- setPlayerCategory(player , global.Categories[1].name)
- if global.TeleporterButtonActivated == true then
+ storage.players[player.name] = {category = "" , page = 1}
+ setPlayerCategory(player , storage.Categories[1].name)
+ if storage.TeleporterButtonActivated == true then
  
    local playerNum5 = 1
       
@@ -54,19 +54,19 @@ script.on_event(defines.events.on_player_created, function(event)
 end)
 
 function initializeVaiables()
-  if global.TelaportLocations == nil then
-     global.TelaportLocations = {}
-     global.TelaportLocations[0] = {}
-     global.TeleporterButtonActivated = false
-        --global.TelaportLocations[x][1] = name
-        --global.TelaportLocations[x][2] = x 
-        --global.TelaportLocations[x][3] = y 
-        --global.TelaportLocations[x][4] = surface
-        --global.TelaportLocations[x][5] = marker entity
-        --global.telaportLocations[x][6] = array of categories starting at position 1 currently only one allowed
-        --global.telaportLocations[x][6][x]= is  (Categorie name,position)
+  if storage.TelaportLocations == nil then
+     storage.TelaportLocations = {}
+     storage.TelaportLocations[0] = {}
+     storage.TeleporterButtonActivated = false
+        --storage.TelaportLocations[x][1] = name
+        --storage.TelaportLocations[x][2] = x 
+        --storage.TelaportLocations[x][3] = y 
+        --storage.TelaportLocations[x][4] = surface
+        --storage.TelaportLocations[x][5] = marker entity
+        --storage.telaportLocations[x][6] = array of categories starting at position 1 currently only one allowed
+        --storage.telaportLocations[x][6][x]= is  (Categorie name,position)
     else
-      for i,telaportLoc in ipairs(global.TelaportLocations) do
+      for i,telaportLoc in ipairs(storage.TelaportLocations) do
         if telaportLoc[5] == nil then
           local position ={}
           position.x = telaportLoc[2]
@@ -78,8 +78,8 @@ function initializeVaiables()
       end
     end
     
-  if global.TelaportLocations[0] ~= nil and  global.TelaportLocations[0][6] == nil then
-    for i, telaportLoc in ipairs(global.TelaportLocations) do
+  if storage.TelaportLocations[0] ~= nil and  storage.TelaportLocations[0][6] == nil then
+    for i, telaportLoc in ipairs(storage.TelaportLocations) do
       if telaportLoc[6] == nil then
         local category = {name = "ALL" , position = i}
         telaportLoc[6] = {}
@@ -89,19 +89,19 @@ function initializeVaiables()
     remakeWindow = true
   end
   
-  if global.Categories == nil then
-    global.Categories = {}
-    global.Categories[1] = {name = "ALL" , showRepeats = false}
+  if storage.Categories == nil then
+    storage.Categories = {}
+    storage.Categories[1] = {name = "ALL" , showRepeats = false}
     remakeWindow = true
   end
 
-  if global.players == nil then 
-    global.players = {}
+  if storage.players == nil then 
+    storage.players = {}
     local playerNum1 = 1
     while game.players[playerNum1] do
       player = game.players[playerNum1]
-      global.players[player.name] = {}
-      setPlayerCategory(player , global.Categories[1].name)
+      storage.players[player.name] = {}
+      setPlayerCategory(player , storage.Categories[1].name)
       setPlayerPage( player , 1 )
       playerNum1 = playerNum1 +1
     end
@@ -128,7 +128,7 @@ function creatTelportWindow(Parplayer)
   local player = Parplayer
   local gui = player.gui.left
 
-  if global.TeleporterButtonActivated == false then
+  if storage.TeleporterButtonActivated == false then
     if gui.personlaTeleportWindow ~= nil then
       gui.personlaTeleportWindow.destroy()
     end
@@ -169,7 +169,7 @@ function creatTelportWindow(Parplayer)
   buttonFlow.add({type="label", name="TelaportInfoPages", caption=playerPage.."/"..Count, style="blueprint_label_style"})
   buttonFlow.add({type="button", name=createButtonName("teleportPageForward"), caption=">", style="blueprint_button_style"})
   
-  for i,category in ipairs(global.Categories) do
+  for i,category in ipairs(storage.Categories) do
     if category.name == playersCurrentCategory then 
       buttonFlow.add({type="button", name=createButtonName("teleportCategory",category.name), caption=category.name, style="blueprint_button_style_bold"})
     else
@@ -177,7 +177,7 @@ function creatTelportWindow(Parplayer)
     end
   end
   
-  if tableSize(global.Categories) < 5 then 
+  if tableSize(storage.Categories) < 5 then 
     buttonFlow.add({type="button", name=createButtonName("teleportCategoryAdd"), caption="+", style="blueprint_button_style"})
   end
   
@@ -389,7 +389,7 @@ script.on_event(defines.events.on_gui_click, function(event)
     local newName = player.gui.center.TelaportCategorySettingWindow.TelaportCategorySettingText.text
     newName = cleanupName(newName)
     if newName ~= nil and newName ~= '' then
-      for i,category in ipairs(global.Categories) do
+      for i,category in ipairs(storage.Categories) do
         if category.name == newName then 
           player.gui.center.TelaportCategorySettingWindow.destroy()
           setPlayerWindowOpenNamePrefix(player, nil)
@@ -397,12 +397,12 @@ script.on_event(defines.events.on_gui_click, function(event)
           return
         end
       end
-      for i,category in ipairs(global.Categories) do 
+      for i,category in ipairs(storage.Categories) do 
         if category.name == CategoryCurrentName then 
           category.name = newName
         end
       end
-      for i,telaportLoc in ipairs(global.TelaportLocations) do 
+      for i,telaportLoc in ipairs(storage.TelaportLocations) do 
         for x,category in ipairs(telaportLoc[6]) do 
           if category.name == CategoryCurrentName then
             category.name = newName
@@ -438,7 +438,7 @@ script.on_event(defines.events.on_gui_click, function(event)
     local newCategoryName = data[4]
     local currentCategory = getPlayerCategory(player)
     local done = false
-    for i,telaportLoc in ipairs(global.TelaportLocations) do 
+    for i,telaportLoc in ipairs(storage.TelaportLocations) do 
       for x,category in ipairs(telaportLoc[6]) do 
         if category.name == currentCategory and category.position == categoryPosition then
           category.position = getNextPosition( newCategoryName )
@@ -489,13 +489,13 @@ script.on_event(defines.events.on_gui_click, function(event)
       --alert that player can not categories that still have teleporters in it
       player.print("can't delete category: " .. CategoryCurrentName .. " because it's not empty.")
       canDelete = false
-    elseif tableSize(global.Categories) == 1 then
+    elseif tableSize(storage.Categories) == 1 then
       player.print("can't delete category: " .. CategoryCurrentName .. " because it is the only category.")
     else
-      for i,catagory in pairs(global.Categories) do 
+      for i,catagory in pairs(storage.Categories) do 
         if catagory.name == CategoryCurrentName then
-          table.remove(global.Categories,i)
-          setPlayerCategory( player , global.Categories[1].name )
+          table.remove(storage.Categories,i)
+          setPlayerCategory( player , storage.Categories[1].name )
           creatTelportWindow(player)
         end
       end
@@ -554,23 +554,23 @@ end
   
   
 script.on_event(defines.events.on_built_entity, function(event)
-   if string.find(event.created_entity.name,"Teleporter_Beacon") then
+   if string.find(event.entity.name,"Teleporter_Beacon") then
       builtTelaporterBeacon(event)
    end
 end)
 
 function builtTelaporterBeacon(event)
-  local x = event.created_entity.position.x
-  local y = event.created_entity.position.y
-  local surface = event.created_entity.surface.name
+  local x = event.entity.position.x
+  local y = event.entity.position.y
+  local surface = event.entity.surface.name
 
    initializeVaiables()
-  local TP_marker = event.created_entity.surface.create_entity({name="TP_marker",position = event.created_entity.position, force = game.forces.neutral})
+  local TP_marker = event.entity.surface.create_entity({name="TP_marker",position = event.entity.position, force = game.forces.neutral})
   TP_marker.backer_name = "x:"..x..",y:"..y..",s:"..surface
 
-  local category = {name = global.Categories[1].name , position = getNextPosition(global.Categories[1].name)}
-  table.insert(global.TelaportLocations,{"x:"..x..",y:"..y..",s:"..surface,x,y,surface,TP_marker,{category}})
-  global.TeleporterButtonActivated = true
+  local category = {name = storage.Categories[1].name , position = getNextPosition(storage.Categories[1].name)}
+  table.insert(storage.TelaportLocations,{"x:"..x..",y:"..y..",s:"..surface,x,y,surface,TP_marker,{category}})
+  storage.TeleporterButtonActivated = true
   local playerNum = 1
 
   while game.players[playerNum] do
@@ -586,7 +586,7 @@ function builtTelaporterBeacon(event)
 end
 
 script.on_event(defines.events.on_robot_built_entity, function(event)
-  if string.find(event.created_entity.name,"Teleporter_Beacon") then
+  if string.find(event.entity.name,"Teleporter_Beacon") then
     builtTelaporterBeacon(event)
   end
 end)
@@ -625,7 +625,7 @@ function onTPMarkerCloned(event)
   local sourceEntity = event.source
   local destinationEntity = event.destination
   
-  for i,telaportLoc in ipairs(global.TelaportLocations) do
+  for i,telaportLoc in ipairs(storage.TelaportLocations) do
     if (i > 0) then
       if (sourceEntity.surface.name == telaportLoc[4]) then
         if (sourceEntity.position.x == telaportLoc[2] and sourceEntity.position.y == telaportLoc[3]) then
@@ -652,7 +652,7 @@ function onTeleporterCloned(event)
   local sourceEntity = event.source
   local destinationEntity = event.destination
   
-  for i,telaportLoc in ipairs(global.TelaportLocations) do
+  for i,telaportLoc in ipairs(storage.TelaportLocations) do
     if (i > 0) then
       if (sourceEntity.surface.name == telaportLoc[4]) then
         if (sourceEntity.position.x == telaportLoc[2] and sourceEntity.position.y == telaportLoc[3]) then
@@ -668,13 +668,13 @@ function onTeleporterCloned(event)
 end
 
 function updateTelporterList()
-   for i,telaportLoc in ipairs(global.TelaportLocations) do
+   for i,telaportLoc in ipairs(storage.TelaportLocations) do
     if (i > 0) then
       local teleportSurface = "nauvis"
       if telaportLoc[4] ~= nil then
         teleportSurface = telaportLoc[4]
       end
-      local localEntities = game.surfaces[teleportSurface].find_entities({{telaportLoc[2]-1,telaportLoc[3]+1},{telaportLoc[2]+1,telaportLoc[3]-1}})
+      local localEntities = game.surfaces[teleportSurface].find_entities({{telaportLoc[2]-1,telaportLoc[3]-1},{telaportLoc[2]+1,telaportLoc[3]+1}})
       --local localEntities = game.surfaces["nauvis"].find_entity("T",{telaportLoc[2],telaportLoc[3]})
       local destoryed = true
       for x,entity in ipairs(localEntities) do
@@ -694,8 +694,8 @@ function updateTelporterList()
 end
 
 function removeTelFromList(localTelIndex)
-  global.TelaportLocations[localTelIndex][5].destroy()
-	table.remove(global.TelaportLocations,localTelIndex)
+  storage.TelaportLocations[localTelIndex][5].destroy()
+	table.remove(storage.TelaportLocations,localTelIndex)
   callapseAllCategorys()
   recreateOpenWindows()
 end
@@ -727,7 +727,7 @@ end
 
 function getTelaportLocations( Category )
   local locations = {}
-  for i,telaportLoc in ipairs(global.TelaportLocations) do 
+  for i,telaportLoc in ipairs(storage.TelaportLocations) do 
     for x,category in ipairs(telaportLoc[6]) do 
       if category.name == Category then
         locations[category.position] = telaportLoc
@@ -752,7 +752,7 @@ end
 
 function getNextPosition( Category )
   local position = 0
-  for i,telaportLoc in ipairs(global.TelaportLocations) do 
+  for i,telaportLoc in ipairs(storage.TelaportLocations) do 
     for x,category in ipairs(telaportLoc[6]) do 
       if category.name == Category then
         if category.position > position then 
@@ -766,7 +766,7 @@ end
 
 function createTelaportSetCategoryWindow(gui,categoryPosition, currentCategory)
   local frame = gui.add({type="frame", name="TelaportSetCategoryWindow", direction="vertical", caption="Move Telaporter to:"})
-  for i,category in ipairs(global.Categories) do 
+  for i,category in ipairs(storage.Categories) do 
     if category.name ~= currentCategory then 
       frame.add({type="button", name=createButtonName("TelaportSetCategory_OK",categoryPosition.."_"..category.name), caption=category.name})
     end
@@ -803,7 +803,7 @@ end
 
 function getPlayerCategory( player )
   if getGlobalPlayer( player ).category == nil then 
-    setPlayerCategory( player , global.Categories[1].name )
+    setPlayerCategory( player , storage.Categories[1].name )
   end
   return getGlobalPlayer( player ).category
 end
@@ -827,7 +827,7 @@ function setPlayerPage( player , page )
 end
 
 function addCategory(categoryName)
-  global.Categories[tableSize(global.Categories)+1] = {name = categoryName}
+  storage.Categories[tableSize(storage.Categories)+1] = {name = categoryName}
 end
 
 function getTelaporter(player , position)
@@ -851,7 +851,7 @@ function callapseCategory(category)
 end
 
 function callapseAllCategorys()
-  for i,catagory in pairs(global.Categories) do 
+  for i,catagory in pairs(storage.Categories) do 
     callapseCategory(catagory.name)
   end
 end
@@ -860,7 +860,7 @@ end
 -- return true if category name is already in use else return false 
 function categoryNameAllreadyExist(newCategoryName,player)
   newName = newCategoryName
-    for i,category in ipairs(global.Categories) do
+    for i,category in ipairs(storage.Categories) do
       if category.name == newName then
         player.print("can't rename Category to a name that already exist")
         return true
@@ -880,16 +880,16 @@ function recreateOpenWindows()
   end
 end
 
--- get the player from the global varible 
--- allowed to access global to get players
--- should be the only access point to global.players
+-- get the player from the storage varible 
+-- allowed to access storage to get players
+-- should be the only access point to storage.players
 function getGlobalPlayer( player )
-  if global.players[player.name] == nil then 
-    global.players[player.name] = {}
-    setPlayerCategory(player , global.Categories[1].name)
+  if storage.players[player.name] == nil then 
+    storage.players[player.name] = {}
+    setPlayerCategory(player , storage.Categories[1].name)
     setPlayerPage( player , 1 )
   end
-  return  global.players[player.name]
+  return  storage.players[player.name]
 end
 
 function printMessage(errorLevel , message)
