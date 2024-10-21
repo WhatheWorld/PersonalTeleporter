@@ -13,7 +13,7 @@ data:extend({
     max_health = 150,
     corpse = "medium-remnants",
     collision_box = {{-2, -2}, {2,2}},
-    collision_mask = {"water-tile", "item-layer", "object-layer"},
+    collision_mask = {layers = {item = true, meltable = true, object = true, player = true, water_tile = true, is_object = true, is_lower_object = true}},
     selection_box = {{-2, -2}, {2, 2}},
 	render_layer = decorative,
     energy_source =

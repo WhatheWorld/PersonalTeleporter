@@ -19,7 +19,7 @@ data:extend({
 	type = "fluid",
 	name = "liquid-alien-artifacts",
 	default_temperature = 50,
-	heat_capacity = "1KJ",
+	heat_capacity = "1kJ",
     base_color = {r=0, g=0, b=0},
     flow_color = {r=1, g=0, b=1},
 	max_temperature = 200,
