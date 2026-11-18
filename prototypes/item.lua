@@ -46,7 +46,7 @@ data:extend({
 	type = "item",
 	name = "Personal-Teleporter",
 	icon = "__PersonalTeleporter__/graphics/Personal_Teleporter_item.png",
-	placed_as_equipment_result = "Personal-Teleporter",
+	place_as_equipment_result = "Personal-Teleporter",
 	subgroup = "equipment",
 	order = "g-a-a",
 	stack_size= 1,

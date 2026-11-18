@@ -12,10 +12,11 @@ data:extend({
     minable = {hardness = 0.2, mining_time = 0.5, result = "Teleporter_Beacon"},
     max_health = 150,
     corpse = "medium-remnants",
-    collision_box = {{-2, -2}, {2,2}},
-    collision_mask = {layers = {item = true, meltable = true, object = true, player = true, water_tile = true, is_object = true, is_lower_object = true}},
+    collision_box = {{-1.85, -1.85}, {1.85, 1.85}},
+    collision_mask = {layers = {item = true, meltable = true, object = true, water_tile = true}},
     selection_box = {{-2, -2}, {2, 2}},
-	render_layer = decorative,
+    render_layer = decorative,
+    energy_usage = "0kW",
     energy_source =
     {
       type = "electric",
@@ -64,7 +65,7 @@ data:extend({
 		type = "train-stop",
 		name = "TP_marker",
 		icon = "__PersonalTeleporter__/graphics/icon.png",
-		flags = {"placeable-off-grid", "placeable-neutral", "player-creation", "filter-directions"},
+		flags = {"placeable-off-grid", "placeable-neutral", "player-creation", "filter-directions","not-selectable-in-game"},
 		order = "y",
 		selectable_in_game = false,
 		minable = {mining_time = 1, result = "train-stop"},
@@ -74,10 +75,9 @@ data:extend({
 		collision_box = {{0,0}, {0,0}},
 		selection_box = {{0,0}, {0,0}},
 		drawing_box = {{0,0}, {0,0}},
-		tile_width = 1,
-		tile_height = 1,
     icon_size = 32,
 		animation_ticks_per_frame = 0,
+    alert_icon_scale=0,
 	
 		vehicle_impact_sound =	{ filename = "__base__/sound/car-metal-impact.ogg", volume = 0 },
 		working_sound =
