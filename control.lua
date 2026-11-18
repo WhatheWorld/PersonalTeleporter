@@ -234,6 +234,11 @@ script.on_event(defines.events.on_gui_click, function(event)
      local noPT = true
      local PTHasEnergy = false
      local TBHasEnergy = false
+     if player.get_inventory(defines.inventory.character_armor) == nil then
+      player.print("Can not teleport in this menu.")
+      return
+     end
+     
      if player.get_inventory(defines.inventory.character_armor)[1].valid_for_read then    --get_item_count("Personal-Teleporter") > 0 then
       if player.get_inventory(defines.inventory.character_armor)[1].grid then
         local equipment = player.get_inventory(defines.inventory.character_armor)[1].grid.equipment
@@ -253,7 +258,7 @@ script.on_event(defines.events.on_gui_click, function(event)
               if TelporterLocation[4] ~= nil then
                 teleportSurface = TelporterLocation[4]
               end
-              local localEntities = game.surfaces[teleportSurface].find_entities({{TelporterLocation[2]-1,TelporterLocation[3]+1},{TelporterLocation[2]+1,TelporterLocation[3]-1}})
+              local localEntities = game.surfaces[teleportSurface].find_entities({{TelporterLocation[2]-1,TelporterLocation[3]-1},{TelporterLocation[2]+1,TelporterLocation[3]+1}})
               for x,entity in ipairs(localEntities) do
                 if string.find(entity.name,"Teleporter_Beacon")  then
                   if entity.energy > personalTeleporter.config.energyCostToTeleportBeacon then

@@ -19,7 +19,7 @@ data:extend({
   {
 		type = "recipe",
 		name = "liquid-alien-artifacts",
-		category = "chemistry",
+		categories = {"chemistry"},
 		energy_required = 1,
 		ingredients =
 		{
@@ -36,7 +36,7 @@ data:extend({
 	{
 		type = "recipe",
 		name = "TeleporterCore",
-		category = "crafting-with-fluid",
+		categories = {"crafting-with-fluid"},
 		ingredients =
 		{	
 			{type="fluid", name = "liquid-alien-artifacts", amount = 10}
